@@ -1,0 +1,20 @@
+{
+  "name": "college_asimov",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/frozyCODE/college_Asimov.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/frozyCODE/college_Asimov/issues"
+  },
+  "homepage": "https://github.com/frozyCODE/college_Asimov#readme",
+  "description": ""
+}
