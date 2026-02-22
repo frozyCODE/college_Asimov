@@ -12,7 +12,6 @@ router.get('/', eleveController.getEleves);
 router.post('/', eleveController.addEleve);
 
 // PUT : Mettre à jour un élève précis
-// Le ":id" est une variable dynamique. Express va la capturer et la mettre dans req.params.id
 // URL finale : PUT http://localhost:3000/api/eleves/5
 router.put('/:id', eleveController.updateEleve);
 
