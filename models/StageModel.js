@@ -15,8 +15,8 @@ class StageModel {
      */
     static async addRecherche(data) {
         const [result] = await db.execute(
-            `INSERT INTO Recherches_Stages (eleve_id, nom_entreprise, statut) VALUES (?, ?, ?)`,
-            [data.eleve_id, data.nom_entreprise, data.statut || 'En attente']
+            `INSERT INTO Recherches_Stage (eleve_id, nom_entreprise, resultat) VALUES (?, ?, ?)`,
+            [data.eleve_id, data.nom_entreprise, data.resultat || 'En attente']
         );
         return result.insertId;
     }
@@ -30,7 +30,7 @@ class StageModel {
             SELECT e.id AS eleve_id, u.nom, u.prenom, COUNT(rs.id) AS quantite_contactee
             FROM Eleves e
             JOIN Utilisateurs u ON e.utilisateur_id = u.id
-            JOIN Recherches_Stages rs ON e.id = rs.eleve_id
+            JOIN Recherches_Stage rs ON e.id = rs.eleve_id
             GROUP BY e.id, u.nom, u.prenom
             HAVING COUNT(rs.id) > 15
         `);
