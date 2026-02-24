@@ -3,6 +3,7 @@ const cors = require('cors');
 const eleveRoutes = require('./routes/eleveRoutes');
 const professeurRoutes = require('./routes/professeurRoutes');
 const authRoutes = require('./routes/authRoutes');
+const stageRoutes = require('./routes/stageRoutes');
 const app = express();
 
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/eleves', eleveRoutes);
 app.use('/api/professeurs', professeurRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/stages', stageRoutes);
 
 const PORT = process.env.PORT;
 
