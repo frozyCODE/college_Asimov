@@ -1,8 +1,17 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
+/**
+ * Modèle pour gérer l'interaction avec la base de données concernant les Professeurs.
+ * Concerne principalement des opérations conjointes entre Utilisateurs et Professeurs.
+ */
 class ProfesseurModel {
-    // READ : Récupérer tous les professeurs
+    /**
+     * Récupère la liste de tous les professeurs.
+     * Effectue une jointure entre la table Professeurs et la table Utilisateurs pour obtenir le nom, prénom, email.
+     * 
+     * @returns {Promise<Array<Object>>} Tableau contenant la liste des professeurs.
+     */
     static async getAll() {
         // On joint Eleves et Utilisateurs pour avoir le nom et le prénom
         const [rows] = await db.execute(`
@@ -12,7 +21,18 @@ class ProfesseurModel {
         return rows;
     }
 
-    // CREATE : Ajouter un professeur
+    /**
+     * Crée un nouveau professeur dans le système.
+     * Crée l'utilisateur avec le rôle 'Professeur' et l'enregistre ensuite dans la table Professeurs via transaction.
+     * 
+     * @param {Object} data - Les données du professeur.
+     * @param {string} data.nom - Le nom du professeur.
+     * @param {string} data.prenom - Le prénom du professeur.
+     * @param {string} data.email - L'email du professeur.
+     * @param {string} data.password - Le mot de passe de connexion.
+     * @returns {Promise<number>} L'ID du professeur nouvellement créé.
+     * @throws {Error} Erreur SQL en cas d'échec de transaction.
+     */
     static async create(data) {
         const connexion = await db.getConnection();
         try {
@@ -42,7 +62,16 @@ class ProfesseurModel {
             connexion.release();
         }
     }
-    // UPDATE : Modifier un professeur (ses infos de base)
+    /**
+     * Met à jour les données de base d'un professeur (table Utilisateurs).
+     * 
+     * @param {number|string} id - L'ID de la table Professeurs cible.
+     * @param {Object} data - Les données à mettre à jour.
+     * @param {string} data.nom - Nouveau nom.
+     * @param {string} data.prenom - Nouveau prénom.
+     * @param {string} data.email - Nouvel email.
+     * @returns {Promise<number>} Le nombre de lignes modifiées en base (affectedRows).
+     */
     static async update(id, data) {
         const [result] = await db.execute(
             `UPDATE Utilisateurs u 
@@ -53,7 +82,12 @@ class ProfesseurModel {
         );
         return result.affectedRows;
     }
-    // DELETE : Supprimer un professeur
+    /**
+     * Supprime un professeur (et l'utilisateur lié) du système.
+     * 
+     * @param {number|string} id - L'ID du professeur à supprimer.
+     * @returns {Promise<number>} Le nombre de lignes supprimées.
+     */
     static async delete(id) {
         const [result] = await db.execute(
             `DELETE u FROM Utilisateurs u 

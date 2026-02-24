@@ -1,6 +1,12 @@
 const Eleve = require('../models/EleveModel');
 
-// Fonction pour lister les élèves
+/**
+ * Fonction pour lister tous les élèves.
+ * 
+ * @param {Object} req - L'objet requête Express.
+ * @param {Object} res - L'objet réponse Express.
+ * @returns {Promise<void>} Renvoie un objet JSON contenant la liste des élèves (code 200). Erreur code 500 en cas de problème.
+ */
 const getEleves = async (req, res) => {
     try {
         const liste = await Eleve.getAll();
@@ -10,7 +16,13 @@ const getEleves = async (req, res) => {
     }
 };
 
-// Fonction pour créer un élève
+/**
+ * Fonction pour créer un nouvel élève.
+ * 
+ * @param {Object} req - L'objet requête Express, contenant les données de l'élève (`req.body`).
+ * @param {Object} res - L'objet réponse Express.
+ * @returns {Promise<void>} Renvoie un message de succès et l'ID du nouvel élève (code 201). Erreur code 500 en cas de problème.
+ */
 const addEleve = async (req, res) => {
     try {
         const data = req.body;
@@ -21,7 +33,13 @@ const addEleve = async (req, res) => {
     }
 };
 
-// Fonction pour modifier un élève
+/**
+ * Fonction pour modifier les informations de base d'un élève (nom, prénom, email).
+ * 
+ * @param {Object} req - L'objet requête Express, contenant l'ID en paramètre (`req.params.id`) et les modifications (`req.body`).
+ * @param {Object} res - L'objet réponse Express.
+ * @returns {Promise<void>} Renvoie un message de succès (code 200), ou introuvable (code 404). Erreur code 500 en cas de problème.
+ */
 const updateEleve = async (req, res) => {
     try {
         const id = req.params.id;
@@ -41,7 +59,13 @@ const updateEleve = async (req, res) => {
     }
 };
 
-// Fonction pour supprimer un élève
+/**
+ * Fonction pour supprimer un élève et l'utilisateur associé.
+ * 
+ * @param {Object} req - L'objet requête Express, contenant l'ID en paramètre (`req.params.id`).
+ * @param {Object} res - L'objet réponse Express.
+ * @returns {Promise<void>} Renvoie un message de succès (code 200), ou introuvable (code 404). Erreur code 500 en cas de problème.
+ */
 const deleteEleve = async (req, res) => {
     try {
         const id = req.params.id;
