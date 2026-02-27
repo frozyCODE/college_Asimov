@@ -5,6 +5,7 @@ const professeurRoutes = require('./routes/professeurRoutes');
 const authRoutes = require('./routes/authRoutes');
 const stageRoutes = require('./routes/stageRoutes');
 const inscriptionRoutes = require('./routes/inscriptionRoutes');
+const moyenneRoutes = require('./routes/moyenneRoutes');
 const app = express();
 
 
@@ -17,6 +18,7 @@ app.use('/api/professeurs', professeurRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/stages', stageRoutes);
 app.use('/api/inscriptions', inscriptionRoutes);
+app.use('/api/moyennes', moyenneRoutes);
 
 const PORT = process.env.PORT;
 
