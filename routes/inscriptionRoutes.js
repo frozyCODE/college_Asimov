@@ -1,11 +1,33 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const inscriptionController = require('../controllers/InscriptionController');
+const inscriptionController = require("../controllers/InscriptionController");
+const {
+  verifierToken,
+  autoriserRoles,
+} = require("../middlewares/authMiddleware");
 
-// Routes pour les inscriptions
-router.post('/', inscriptionController.createInscription);
-router.get('/eleve/:eleve_id', inscriptionController.getInscriptionsByEleve);
-router.get('/classe', inscriptionController.getInscriptionsByClasse);
-router.delete('/:id', inscriptionController.deleteInscription);
+router.use(verifierToken);
+
+// Gestion des inscriptions réservée au secrétariat et au proviseur
+router.post(
+  "/",
+  autoriserRoles("Secretariat", "Proviseur"),
+  inscriptionController.createInscription,
+);
+router.get(
+  "/eleve/:eleve_id",
+  autoriserRoles("Professeur", "Secretariat", "Proviseur"),
+  inscriptionController.getInscriptionsByEleve,
+);
+router.get(
+  "/classe",
+  autoriserRoles("Professeur", "Secretariat", "Proviseur"),
+  inscriptionController.getInscriptionsByClasse,
+);
+router.delete(
+  "/:id",
+  autoriserRoles("Secretariat", "Proviseur"),
+  inscriptionController.deleteInscription,
+);
 
 module.exports = router;

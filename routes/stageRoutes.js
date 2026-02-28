@@ -1,8 +1,24 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const stageController = require('../controllers/StageController');
+const stageController = require("../controllers/StageController");
+const {
+  verifierToken,
+  autoriserRoles,
+} = require("../middlewares/authMiddleware");
 
-router.post('/recherches', stageController.addRecherche);
-router.get('/alertes', stageController.getAlertes);
+// Toutes les routes pour les stages sont protégées
+router.use(verifierToken);
+
+// Les élèves ajoutent leurs recherches, les profs/secrétariat voient les alertes
+router.post(
+  "/recherches",
+  autoriserRoles("Eleve", "Proviseur"),
+  stageController.addRecherche,
+);
+router.get(
+  "/alertes",
+  autoriserRoles("Professeur", "Secretariat", "Proviseur"),
+  stageController.getAlertes,
+);
 
 module.exports = router;

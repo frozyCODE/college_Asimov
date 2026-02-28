@@ -1,13 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const moyenneController = require("../controllers/MoyenneController");
+const {
+  verifierToken,
+  autoriserRoles,
+} = require("../middlewares/authMiddleware");
 
-// Routes pour les moyennes
-router.post("/", moyenneController.createMoyenne); // Créer une moyenne
+// Toutes les routes sont protégées
+router.use(verifierToken);
+
+// Création : Professeur ou Proviseur
+router.post(
+  "/",
+  autoriserRoles("Professeur", "Proviseur"),
+  moyenneController.createMoyenne,
+);
+
+// Consultation : Élève (pour les siennes), Professeur, Secrétariat, Proviseur
 router.get(
   "/inscription/:inscription_id",
+  autoriserRoles("Eleve", "Professeur", "Secretariat", "Proviseur"),
   moyenneController.getMoyennesByInscription,
-); // Voir les moyennes d'une inscription
-router.patch("/:id/valider", moyenneController.validerMoyenne); // Valider la moyenne (Proviseur)
+);
+
+// Validation : EXCLUSIVEMENT le Proviseur
+router.patch(
+  "/:id/valider",
+  autoriserRoles("Proviseur"),
+  moyenneController.validerMoyenne,
+);
 
 module.exports = router;
