@@ -1,6 +1,6 @@
 -- Création de la base
-CREATE DATABASE IF NOT EXISTS asimov_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE asimov_db;
+CREATE DATABASE IF NOT EXISTS college_asimov CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE college_asimov;
 
 -- =======================================================
 -- 1. TABLES INDÉPENDANTES (Référentiels et Utilisateurs)
