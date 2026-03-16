@@ -2,11 +2,16 @@ const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
 /**
- * Modèle pour gérer les Parents.
+ * Modèle pour interagir avec les données des Parents.
+ * Gère la création synchronisée d'un Utilisateur/Parent et les liaisons avec les élèves.
+ * @class ParentModel
  */
 class ParentModel {
   /**
-   * Récupère la liste de tous les parents.
+   * Récupère la liste de tous les parents avec leurs informations de base.
+   *
+   * @async
+   * @returns {Promise<Array<Object>>} Tableau contenant les parents (id, nom, prenom, email).
    */
   static async getAll() {
     const [rows] = await db.execute(`
@@ -17,7 +22,17 @@ class ParentModel {
   }
 
   /**
-   * Crée un nouveau parent.
+   * Ajoute un nouveau parent dans la base de données.
+   * Utilise une transaction pour insérer dans `Utilisateurs` (rôle 'Parent') puis dans `Parents`.
+   *
+   * @async
+   * @param {Object} data - Les données du parent.
+   * @param {string} data.nom - Le nom du parent.
+   * @param {string} data.prenom - Le prénom du parent.
+   * @param {string} data.email - L'email du parent.
+   * @param {string} data.password - Le mot de passe en clair (sera hashé).
+   * @returns {Promise<number>} L'ID du parent dans la table `Parents`.
+   * @throws {Error} Si l'insertion échoue.
    */
   static async create(data) {
     const connexion = await db.getConnection();
@@ -49,7 +64,12 @@ class ParentModel {
   }
 
   /**
-   * Lie un parent à un élève.
+   * Lie un parent à un élève spécifique dans la table de jointure `Eleve_Parent`.
+   *
+   * @async
+   * @param {number|string} eleveId - L'ID de l'élève.
+   * @param {number|string} parentId - L'ID du parent.
+   * @returns {Promise<boolean>} TRUE si la liaison a réussi.
    */
   static async linkToEleve(eleveId, parentId) {
     await db.execute(
@@ -60,7 +80,11 @@ class ParentModel {
   }
 
   /**
-   * Récupère les élèves liés à un parent.
+   * Récupère la liste des élèves affiliés à un parent spécifique.
+   *
+   * @async
+   * @param {number|string} parentId - L'ID du parent.
+   * @returns {Promise<Array<Object>>} Tableau contenant les ID, noms et prénoms des enfants.
    */
   static async getElevesByParent(parentId) {
     const [rows] = await db.execute(

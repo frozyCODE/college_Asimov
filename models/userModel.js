@@ -1,25 +1,51 @@
-const db = require('../config/db');
+const db = require("../config/db");
 
 /**
- * Modèle pour gérer l'interaction avec la base de données concernant les Utilisateurs.
- * Utilisé principalement pour l'authentification (login).
+ * Modèle pour gérer l'interaction générique avec la table Utilisateurs.
+ * Utilisé principalement pour l'authentification et la création d'administrateurs.
+ * @class UtilisateurModel
  */
 class UtilisateurModel {
-    /**
-     * Recherche un utilisateur dans la base de données à partir de son adresse email.
-     * 
-     * @param {string} email - L'adresse email de l'utilisateur à rechercher.
-     * @returns {Promise<Object|undefined>} Une promesse résolue avec l'objet de l'utilisateur s'il est trouvé, sinon `undefined`.
-     */
-    static async findByEmail(email) {
-        const [rows] = await db.execute(
-            `SELECT id, nom, prenom, email, password_hash, role 
+  /**
+   * Recherche un utilisateur complet dans la base de données à partir de son adresse email.
+   *
+   * @async
+   * @param {string} email - L'adresse email de l'utilisateur à rechercher.
+   * @returns {Promise<Object|undefined>} Une promesse avec l'objet utilisateur (id, nom, prenom, email, password_hash, role) ou `undefined`.
+   */
+  static async findByEmail(email) {
+    const [rows] = await db.execute(
+      `SELECT id, nom, prenom, email, password_hash, role 
              FROM Utilisateurs 
              WHERE email = ?`,
-            [email]
-        );
-        return rows[0]; 
-    }
+      [email],
+    );
+    return rows[0];
+  }
+
+  /**
+   * Crée un utilisateur de type direction (Proviseur ou Secretariat) directement.
+   * Ne lie l'utilisateur à aucune autre table puisqu'ils n'ont pas de profil spécifique.
+   *
+   * @async
+   * @param {Object} data - Les données du nouvel administrateur.
+   * @param {string} data.nom - Le nom l'admin.
+   * @param {string} data.prenom - Le prenom l'admin.
+   * @param {string} data.email - L'email de l'admin.
+   * @param {string} data.password - Le mot de passe en clair l'admin.
+   * @param {string} data.role - Le rôle ("Proviseur" ou "Secretariat").
+   * @returns {Promise<number>} L'ID de l'utilisateur nouvellement créé.
+   */
+  static async createAdmin(data) {
+    const bcrypt = require("bcrypt");
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const [result] = await db.execute(
+      `INSERT INTO Utilisateurs (nom, prenom, email, password_hash, role) VALUES (?, ?, ?, ?, ?)`,
+      [data.nom, data.prenom, data.email, hashedPassword, data.role],
+    );
+    return result.insertId;
+  }
 }
 
 module.exports = UtilisateurModel;

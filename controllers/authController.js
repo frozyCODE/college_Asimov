@@ -3,12 +3,19 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 /**
- * Gère la connexion d'un utilisateur (Élève, Professeur, etc.).
- * Vérifie l'email et le mot de passe, et renvoie les informations de l'utilisateur si la connexion réussit.
+ * Contrôleur responsable de l'authentification globale.
+ * @module AuthController
+ */
+
+/**
+ * Gère la connexion d'un utilisateur (Élève, Professeur, Direction, etc.).
+ * Vérifie l'email, le mot de passe hashé, et génère un token JWT si succès.
  *
- * @param {Object} req - L'objet requête Express, contenant l'email et le mot de passe dans `req.body`.
- * @param {Object} res - L'objet réponse Express.
- * @returns {Promise<void>} Renvoie un objet JSON avec les informations de l'utilisateur (code 200). Erreur code 401 si identifiants incorrects, ou 500 en cas d'erreur serveur.
+ * @async
+ * @function login
+ * @param {import('express').Request} req - L'objet requête Express, contenant l'email et le mot de passe dans `req.body`.
+ * @param {import('express').Response} res - L'objet réponse Express.
+ * @returns {Promise<void>} 200 avec le Token JWT et les infos publiques de l'utilisateur. 401 si identifiants incorrects. 500 si erreur serveur.
  */
 const login = async (req, res) => {
   try {
@@ -61,12 +68,10 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la tentative de connexion",
-        detail: error.message,
-      });
+    res.status(500).json({
+      message: "Erreur lors de la tentative de connexion",
+      detail: error.message,
+    });
   }
 };
 

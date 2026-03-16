@@ -1,8 +1,14 @@
 const jwt = require("jsonwebtoken");
 
 /**
- * Middleware pour protéger les routes.
- * Vérifie la présence et la validité du token JWT dans le header Authorization.
+ * Middleware pour protéger les routes de l'API.
+ * Vérifie la présence et la validité du token JWT dans le header `Authorization: Bearer <token>`.
+ *
+ * @function verifierToken
+ * @param {import('express').Request} req - L'objet de requête Express.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Fonction de callback pour passer au middleware suivant.
+ * @returns {void} Passe au middleware suivant si valide, ou renvoie une erreur 401/403.
  */
 const verifierToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -22,9 +28,12 @@ const verifierToken = (req, res, next) => {
 };
 
 /**
- * Middleware pour filtrer l'accès selon le rôle de l'utilisateur.
+ * Middleware pour filtrer l'accès selon le ou les rôles de l'utilisateur.
+ * Doit être utilisé APRÈS le middleware `verifierToken`.
  *
+ * @function autoriserRoles
  * @param {...string} rolesAutorises - Liste des rôles autorisés (ex: 'Proviseur', 'Secretariat').
+ * @returns {Function} Un middleware Express.
  */
 const autoriserRoles = (...rolesAutorises) => {
   return (req, res, next) => {

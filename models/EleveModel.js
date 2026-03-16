@@ -3,14 +3,16 @@ const bcrypt = require("bcrypt");
 
 /**
  * Modèle pour interagir avec les données des élèves dans la base de données.
- * Gère le CRUD des élèves qui inclut la gestion de la table Utilisateurs et Eleves conjointement.
+ * Gère le CRUD des élèves qui inclut la gestion synchronisée de la table Utilisateurs et Eleves via des transactions.
+ * @class EleveModel
  */
 class EleveModel {
   /**
    * Récupère la liste de tous les élèves avec leurs options et leurs parents.
-   * Effectue des jointures entre Eleves, Utilisateurs, Options et Parents.
+   * Effectue des jointures complexes entre Eleves, Utilisateurs, Options et Parents.
    *
-   * @returns {Promise<Array<Object>>} Une promesse résolue avec le tableau d'élèves.
+   * @async
+   * @returns {Promise<Array<Object>>} Une promesse résolue avec le tableau d'élèves détaillés.
    */
   static async getAll() {
     const [rows] = await db.execute(`
@@ -36,16 +38,17 @@ class EleveModel {
   /**
    * Ajoute un nouvel élève dans la base de données.
    * Crée d'abord un Utilisateur avec le rôle 'Eleve' puis le lie à la table Eleves.
-   * Gère la transaction SQL pour assurer la cohérence des données.
+   * Utilise une transaction SQL pour garantir que les deux insertions réussissent ou échouent ensemble.
    *
+   * @async
    * @param {Object} data - Les données de l'élève à créer.
    * @param {string} data.nom - Le nom de l'élève.
    * @param {string} data.prenom - Le prénom de l'élève.
    * @param {string} data.email - L'email de l'élève.
-   * @param {string} data.password - Le mot de passe en clair de l'élève.
+   * @param {string} data.password - Le mot de passe en clair de l'élève (sera hashé).
    * @param {string} data.identifiant_csv - L'identifiant externe (ex: issu d'un export CSV).
-   * @returns {Promise<number>} L'ID de l'élève créé.
-   * @throws {Error} Si l'insertion échoue.
+   * @returns {Promise<number>} L'ID de l'élève nouvellement créé dans la table `Eleves`.
+   * @throws {Error} Si l'insertion échoue ou s'il y a un doublon.
    */
   static async create(data) {
     const connexion = await db.getConnection();
@@ -78,8 +81,9 @@ class EleveModel {
   /**
    * Met à jour les informations de base (nom, prénom, email) de l'utilisateur lié à l'élève.
    *
-   * @param {number|string} id - L'ID de la table Eleves pour lequel on souhaite mettre à jour les infos.
-   * @param {Object} data - Les nouvelles données.
+   * @async
+   * @param {number|string} id - L'ID de l'élève dans la table `Eleves`.
+   * @param {Object} data - Les nouvelles données de l'élève.
    * @param {string} data.nom - Le nouveau nom.
    * @param {string} data.prenom - Le nouveau prénom.
    * @param {string} data.email - Le nouvel email.
@@ -97,10 +101,12 @@ class EleveModel {
     return result.affectedRows;
   }
   /**
-   * Supprime un élève et l'utilisateur associé grâce à la suppression en cascade.
+   * Supprime un élève et l'utilisateur associé.
+   * La suppression dans la table `Utilisateurs` entraîne la suppression en cascade dans `Eleves`.
    *
-   * @param {number|string} id - L'ID de la table Eleves à supprimer.
-   * @returns {Promise<number>} Le nombre de lignes affectées.
+   * @async
+   * @param {number|string} id - L'ID de l'élève dans la table `Eleves` à supprimer.
+   * @returns {Promise<number>} Le nombre de lignes affectées (1 si succès).
    */
   static async delete(id) {
     const [result] = await db.execute(

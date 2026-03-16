@@ -8,6 +8,7 @@ const inscriptionRoutes = require("./routes/inscriptionRoutes");
 const moyenneRoutes = require("./routes/moyenneRoutes");
 const optionRoutes = require("./routes/optionRoutes");
 const parentRoutes = require("./routes/parentRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const app = express();
 
 require("dotenv").config();
@@ -22,7 +23,7 @@ app.use("/api/inscriptions", inscriptionRoutes);
 app.use("/api/moyennes", moyenneRoutes);
 app.use("/api/options", optionRoutes);
 app.use("/api/parents", parentRoutes);
-app.use("/api/parents", parentRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT;
 

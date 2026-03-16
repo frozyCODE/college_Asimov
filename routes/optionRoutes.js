@@ -25,4 +25,22 @@ router.delete(
   optionController.desisterOption,
 );
 
+router.get(
+  "/eleve/:eleve_id",
+  autoriserRoles("Eleve", "Parent", "Professeur", "Secretariat", "Proviseur"),
+  optionController.getOptionsByEleve,
+);
+
+router.get(
+  "/:option_id/eleves",
+  autoriserRoles("Professeur", "Secretariat", "Proviseur"),
+  optionController.getElevesByOption,
+);
+
+router.delete(
+  "/:id",
+  autoriserRoles("Secretariat", "Proviseur"),
+  optionController.deleteOption,
+);
+
 module.exports = router;
