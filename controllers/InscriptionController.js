@@ -1,8 +1,9 @@
 const Inscription = require("../models/InscriptionModel");
+const AppError = require("../utils/appError");
 
 /**
- * Contrôleur gérant les Inscriptions des élèves aux classes.
- * @module InscriptionController
+ * @module controllers/InscriptionController
+ * @description Contrôleur gérant les Inscriptions des élèves aux classes.
  */
 
 /**
@@ -11,25 +12,25 @@ const Inscription = require("../models/InscriptionModel");
  * @async
  * @function createInscription
  * @param {import('express').Request} req - Les données d'inscription (`eleve_id`, `annee_scolaire`, `niveau`, `lettre_classe`).
- * @param {import('express').Response} res - L'objet de réponse.
- * @returns {Promise<void>} 201 avec le nouvel ID, 400 si incomplet, ou 500.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 201 avec le nouvel ID.
+ * @throws {AppError} 400 - Si des champs obligatoires sont manquants.
  */
-const createInscription = async (req, res) => {
+const createInscription = async (req, res, next) => {
   try {
     const data = req.body;
-    // Validation basique
+
     if (
       !data.eleve_id ||
       !data.annee_scolaire ||
       !data.niveau ||
       !data.lettre_classe
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Les champs eleve_id, annee_scolaire, niveau et lettre_classe sont obligatoires.",
-        });
+      throw new AppError(
+        "Les champs eleve_id, annee_scolaire, niveau et lettre_classe sont obligatoires.",
+        400,
+      );
     }
 
     const nouvelId = await Inscription.create(data);
@@ -37,12 +38,7 @@ const createInscription = async (req, res) => {
       .status(201)
       .json({ message: "Inscription créée avec succès !", id: nouvelId });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la création de l'inscription",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 
@@ -52,21 +48,17 @@ const createInscription = async (req, res) => {
  * @async
  * @function getInscriptionsByEleve
  * @param {import('express').Request} req - L'ID de l'élève en params (`eleve_id`).
- * @param {import('express').Response} res - L'objet de réponse.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Middleware suivant.
  * @returns {Promise<void>} 200 avec la liste des inscriptions.
  */
-const getInscriptionsByEleve = async (req, res) => {
+const getInscriptionsByEleve = async (req, res, next) => {
   try {
     const eleve_id = req.params.eleve_id;
     const inscriptions = await Inscription.findByEleve(eleve_id);
     res.status(200).json(inscriptions);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 
@@ -76,20 +68,20 @@ const getInscriptionsByEleve = async (req, res) => {
  * @async
  * @function getInscriptionsByClasse
  * @param {import('express').Request} req - Les critères de recherche en query (`annee_scolaire`, `niveau`, `lettre_classe`).
- * @param {import('express').Response} res - L'objet de réponse.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Middleware suivant.
  * @returns {Promise<void>} 200 avec le tableau des élèves de la classe.
+ * @throws {AppError} 400 - Si des critères de recherche sont manquants.
  */
-const getInscriptionsByClasse = async (req, res) => {
+const getInscriptionsByClasse = async (req, res, next) => {
   try {
     const { annee_scolaire, niveau, lettre_classe } = req.query;
 
     if (!annee_scolaire || !niveau || !lettre_classe) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Veuillez fournir annee_scolaire, niveau et lettre_classe en paramètres (query).",
-        });
+      throw new AppError(
+        "Veuillez fournir annee_scolaire, niveau et lettre_classe en paramètres (query).",
+        400,
+      );
     }
 
     const inscriptions = await Inscription.findByClasse(
@@ -99,12 +91,7 @@ const getInscriptionsByClasse = async (req, res) => {
     );
     res.status(200).json(inscriptions);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 
@@ -114,26 +101,23 @@ const getInscriptionsByClasse = async (req, res) => {
  * @async
  * @function deleteInscription
  * @param {import('express').Request} req - L'ID de l'inscription en params (`id`).
- * @param {import('express').Response} res - L'objet de réponse.
- * @returns {Promise<void>} 200 si succès, ou 404 introuvable.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 si succès.
+ * @throws {AppError} 404 - Si l'inscription est introuvable.
  */
-const deleteInscription = async (req, res) => {
+const deleteInscription = async (req, res, next) => {
   try {
     const id = req.params.id;
     const affectedRows = await Inscription.delete(id);
 
     if (affectedRows === 0) {
-      return res.status(404).json({ message: "Inscription introuvable." });
+      throw new AppError("Inscription introuvable.", 404);
     }
 
     res.status(200).json({ message: "Inscription supprimée avec succès !" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la suppression",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 

@@ -1,85 +1,96 @@
 const Moyenne = require("../models/MoyenneModel");
+const AppError = require("../utils/appError");
 
 /**
- * Contrôleur traitant l'enregistrement et la validation des moyennes trimestrielles/semestrielles.
- * @module MoyenneController
+ * @module controllers/MoyenneController
+ * @description Contrôleur gérant les opérations sur les moyennes semestrielles.
  */
 
 /**
- * Insérer une nouvelle moyenne pour une inscription spécifique.
+ * Créer une nouvelle moyenne semestrielle pour une inscription.
  *
  * @async
  * @function createMoyenne
- * @param {import('express').Request} req - Les données de la note globale (`inscription_id`, `semestre`, `moyenne_generale`).
+ * @param {import('express').Request} req - Données de la moyenne (`inscription_id`, `semestre`, `moyenne_generale`).
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} Renvoie 201 avec l'ID en cas de succès, 400 si infos manquantes ou 500.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 201 avec l'ID du nouvel enregistrement.
+ * @throws {AppError} 400 - Si les données sont incomplètes.
  */
-const createMoyenne = async (req, res) => {
+const createMoyenne = async (req, res, next) => {
   try {
-    const data = req.body;
-    if (!data.inscription_id || !data.semestre || !data.moyenne_generale) {
-      return res.status(400).json({
-        message:
-          "Les champs inscription_id, semestre et moyenne_generale sont obligatoires.",
-      });
+    const { inscription_id, semestre, moyenne_generale } = req.body;
+
+    if (!inscription_id || !semestre || moyenne_generale === undefined) {
+      throw new AppError(
+        "L'identifiant d'inscription, le semestre et la moyenne sont obligatoires.",
+        400,
+      );
     }
-    const nouvelId = await Moyenne.create(data);
-    res
-      .status(201)
-      .json({ message: "Moyenne ajoutée avec succès !", id: nouvelId });
-  } catch (error) {
-    res.status(500).json({
-      message: "Erreur lors de l'ajout de la moyenne",
-      detail: error.message,
+
+    const nouvelId = await Moyenne.create({
+      inscription_id,
+      semestre,
+      moyenne_generale,
     });
+
+    res.status(201).json({
+      message: "Moyenne enregistrée avec succès !",
+      id: nouvelId,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
 /**
- * Récupérer toutes les moyennes (historique) associées à l'inscription d'un élève.
+ * Récupérer les moyennes associées à une inscription spécifique.
  *
  * @async
  * @function getMoyennesByInscription
- * @param {import('express').Request} req - L'ID de l'inscription cible en params (`inscription_id`).
+ * @param {import('express').Request} req - L'ID de l'inscription en params (`inscription_id`).
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 200 avec la liste des notes, 500 en cas de problème serveur.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 avec la liste des moyennes.
  */
-const getMoyennesByInscription = async (req, res) => {
+const getMoyennesByInscription = async (req, res, next) => {
   try {
-    const inscription_id = req.params.inscription_id;
+    const { inscription_id } = req.params;
     const moyennes = await Moyenne.findByInscription(inscription_id);
     res.status(200).json(moyennes);
   } catch (error) {
-    res.status(500).json({
-      message: "Erreur lors de la récupération",
-      detail: error.message,
-    });
+    next(error);
   }
 };
 
 /**
- * Figer et sceller une moyenne officielle (Action exclusive assignée au Proviseur).
+ * Valider officiellement une moyenne par le proviseur.
  *
  * @async
  * @function validerMoyenne
- * @param {import('express').Request} req - L'ID de la moyenne à valider dans `req.params.id`.
+ * @param {import('express').Request} req - L'ID de la moyenne en params (`id`).
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 200 si la moyenne est scellée, 404 si elle n'existe pas, ou 500 en cas de bug.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 en cas de succès.
+ * @throws {AppError} 404 - Si la moyenne est introuvable.
  */
-const validerMoyenne = async (req, res) => {
+const validerMoyenne = async (req, res, next) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const affectedRows = await Moyenne.validerParProviseur(id);
-    if (affectedRows === 0)
-      return res.status(404).json({ message: "Moyenne introuvable." });
-    res
-      .status(200)
-      .json({ message: "Moyenne validée par le proviseur avec succès !" });
+
+    if (affectedRows === 0) {
+      throw new AppError("Moyenne introuvable.", 404);
+    }
+
+    res.status(200).json({ message: "Moyenne validée avec succès !" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la validation", detail: error.message });
+    next(error);
   }
 };
 
-module.exports = { createMoyenne, getMoyennesByInscription, validerMoyenne };
+module.exports = {
+  createMoyenne,
+  getMoyennesByInscription,
+  validerMoyenne,
+};

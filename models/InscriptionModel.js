@@ -1,13 +1,21 @@
 const db = require('../config/db');
 
 /**
- * Modèle pour interagir avec la table Inscriptions.
+ * @class InscriptionModel
+ * @description Modèle pour interagir avec la table Inscriptions. Gère les liens entre les élèves et leurs classes pour une année scolaire.
  */
 class InscriptionModel {
     /**
-     * Crée une nouvelle inscription pour un élève
-     * @param {Object} data 
-     * @returns {Promise<number>} ID de la nouvelle inscription
+     * Crée une nouvelle inscription pour un élève.
+     * 
+     * @async
+     * @static
+     * @param {Object} data - Les données d'inscription.
+     * @param {number} data.eleve_id - L'identifiant de l'élève.
+     * @param {string} data.annee_scolaire - L'année (ex: '2023-2024').
+     * @param {number} data.niveau - Le niveau d'étude (ex: 6, 5, 4, 3).
+     * @param {string} data.lettre_classe - La lettre de la classe (ex: 'A', 'B').
+     * @returns {Promise<number>} L'ID de la nouvelle inscription créée.
      */
     static async create(data) {
         const { eleve_id, annee_scolaire, niveau, lettre_classe } = data;
@@ -20,9 +28,12 @@ class InscriptionModel {
     }
 
     /**
-     * Récupère toutes les inscriptions d'un élève donné.
-     * @param {number} eleve_id 
-     * @returns {Promise<Array>}
+     * Récupère l'historique complet des inscriptions d'un élève.
+     * 
+     * @async
+     * @static
+     * @param {number|string} eleve_id - L'identifiant de l'élève.
+     * @returns {Promise<Array<Object>>} Liste des inscriptions triées par année descendante.
      */
     static async findByEleve(eleve_id) {
         const [rows] = await db.execute(
@@ -33,11 +44,15 @@ class InscriptionModel {
     }
 
     /**
-     * Récupère toutes les inscriptions pour une classe spécifique dans une année scolaire donnée.
-     * @param {string} annee_scolaire 
-     * @param {number} niveau 
-     * @param {string} lettre_classe 
-     * @returns {Promise<Array>} Liste détaillée des élèves inscrits
+     * Récupère toutes les inscriptions pour une classe spécifique.
+     * Récupère également les informations d'identité de l'élève via jointure.
+     * 
+     * @async
+     * @static
+     * @param {string} annee_scolaire - L'année scolaire ciblée.
+     * @param {number|string} niveau - Le niveau (ex: 3).
+     * @param {string} lettre_classe - La lettre (ex: 'C').
+     * @returns {Promise<Array<Object>>} Liste détaillée des élèves inscrits dans cette classe.
      */
     static async findByClasse(annee_scolaire, niveau, lettre_classe) {
         const [rows] = await db.execute(
@@ -52,9 +67,12 @@ class InscriptionModel {
     }
 
     /**
-     * Supprime une inscription par son ID.
-     * @param {number} id 
-     * @returns {Promise<number>} Nombre de lignes affectées
+     * Supprime définitivement une inscription.
+     * 
+     * @async
+     * @static
+     * @param {number|string} id - L'ID de l'inscription à supprimer.
+     * @returns {Promise<number>} Le nombre de lignes supprimées (1 si succès).
      */
     static async delete(id) {
         const [result] = await db.execute(

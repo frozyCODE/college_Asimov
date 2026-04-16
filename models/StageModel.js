@@ -1,16 +1,19 @@
 const db = require('../config/db');
 
 /**
- * Modèle pour gérer l'interaction avec la base de données concernant les Stages.
+ * @class StageModel
+ * @description Modèle pour gérer l'interaction avec la base de données concernant les recherches et alertes de stages.
  */
 class StageModel {
     /**
      * Ajoute une nouvelle recherche de stage pour un élève.
      * 
+     * @async
+     * @static
      * @param {Object} data - Les données de la recherche de stage.
-     * @param {number} data.eleve_id - L'ID de l'élève.
-     * @param {string} data.nom_entreprise - Le nom de l'entreprise.
-     * @param {string} [data.statut='En attente'] - Le statut de la recherche.
+     * @param {number|string} data.eleve_id - L'ID de l'élève.
+     * @param {string} data.nom_entreprise - Le nom de l'entreprise contactée.
+     * @param {string} [data.resultat='En attente'] - Le résultat de la démarche.
      * @returns {Promise<number>} L'ID de la recherche de stage nouvellement créée.
      */
     static async addRecherche(data) {
@@ -20,10 +23,14 @@ class StageModel {
         );
         return result.insertId;
     }
+
     /**
-     * Récupère la liste des élèves ayant effectué plus de 15 recherches de stage.
+     * Récupère la liste des élèves ayant effectué plus de 15 recherches de stage (seuil d'alerte).
+     * Permet aux professeurs de suivre les élèves en difficulté de recherche.
      * 
-     * @returns {Promise<Array<Object>>} Tableau contenant les élèves en alerte.
+     * @async
+     * @static
+     * @returns {Promise<Array<Object>>} Tableau contenant les élèves en alerte avec le compte de contacts.
      */
     static async getAlertes() {
         const [rows] = await db.execute(`

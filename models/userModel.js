@@ -1,15 +1,15 @@
 const db = require("../config/db");
 
 /**
- * Modèle pour gérer l'interaction générique avec la table Utilisateurs.
- * Utilisé principalement pour l'authentification et la création d'administrateurs.
  * @class UtilisateurModel
+ * @description Modèle pour gérer l'interaction générique avec la table Utilisateurs. Utilisé principalement pour l'authentification et la création d'administrateurs.
  */
 class UtilisateurModel {
   /**
    * Recherche un utilisateur complet dans la base de données à partir de son adresse email.
    *
    * @async
+   * @static
    * @param {string} email - L'adresse email de l'utilisateur à rechercher.
    * @returns {Promise<Object|undefined>} Une promesse avec l'objet utilisateur (id, nom, prenom, email, password_hash, role) ou `undefined`.
    */
@@ -28,11 +28,12 @@ class UtilisateurModel {
    * Ne lie l'utilisateur à aucune autre table puisqu'ils n'ont pas de profil spécifique.
    *
    * @async
+   * @static
    * @param {Object} data - Les données du nouvel administrateur.
-   * @param {string} data.nom - Le nom l'admin.
-   * @param {string} data.prenom - Le prenom l'admin.
-   * @param {string} data.email - L'email de l'admin.
-   * @param {string} data.password - Le mot de passe en clair l'admin.
+   * @param {string} data.nom - Le nom de l'administrateur.
+   * @param {string} data.prenom - Le prénom de l'administrateur.
+   * @param {string} data.email - L'email de l'administrateur.
+   * @param {string} data.password - Le mot de passe en clair (sera hashé).
    * @param {string} data.role - Le rôle ("Proviseur" ou "Secretariat").
    * @returns {Promise<number>} L'ID de l'utilisateur nouvellement créé.
    */

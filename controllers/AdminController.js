@@ -1,8 +1,10 @@
 const Utilisateur = require("../models/userModel");
+const response = require("../utils/responseHelper");
+const AppError = require("../utils/appError");
 
 /**
- * Contrôleur gérant la création des comptes administratifs.
- * @module AdminController
+ * @module controllers/AdminController
+ * @description Contrôleur gérant la création des comptes administratifs.
  */
 
 /**
@@ -10,48 +12,39 @@ const Utilisateur = require("../models/userModel");
  *
  * @async
  * @function createAdminUser
- * @param {import('express').Request} req - L'objet de requête Express contenant (nom, prenom, email, password, role).
+ * @param {import('express').Request} req - L'objet de requête Express.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 201 si succès avec l'ID, 400 si validation échoue, ou 500 en cas d'erreur.
+ * @param {import('express').NextFunction} next - La fonction next d'Express.
+ * @returns {Promise<void>} Renvoie un code 201 en cas de succès.
+ * @throws {AppError} 400 - Si le rôle est invalide ou l'email est déjà pris.
  */
-const createAdminUser = async (req, res) => {
+const createAdminUser = async (req, res, next) => {
   try {
     const { nom, prenom, email, password, role } = req.body;
 
-    // 1. Validations basiques
-    if (!nom || !prenom || !email || !password || !role) {
-      return res.status(400).json({
-        message:
-          "Tous les champs (nom, prenom, email, password, role) sont obligatoires.",
-      });
-    }
-
+    // 1. Double vérification métier du rôle
     if (role !== "Proviseur" && role !== "Secretariat") {
-      return res.status(400).json({
-        message: "Le rôle doit être soit 'Proviseur' soit 'Secretariat'.",
-      });
+      throw new AppError(
+        "Le rôle doit être soit 'Proviseur' soit 'Secretariat'.",
+        400,
+      );
     }
 
     // 2. Vérification si l'email existe déjà
     const userExists = await Utilisateur.findByEmail(email);
     if (userExists) {
-      return res
-        .status(400)
-        .json({ message: "Cet email est déjà utilisé par un autre compte." });
+      throw new AppError("Cet email est déjà utilisé par un autre compte.", 400);
     }
 
     // 3. Création de l'utilisateur
     const data = { nom, prenom, email, password, role };
     const nouvelId = await Utilisateur.createAdmin(data);
 
-    res
-      .status(201)
-      .json({ message: `${role} créé avec succès !`, id: nouvelId });
-  } catch (error) {
-    res.status(500).json({
-      message: "Erreur lors de la création du compte administrateur",
-      detail: error.message,
+    return response.success(res, 201, `${role} créé avec succès !`, {
+      id: nouvelId,
     });
+  } catch (error) {
+    next(error);
   }
 };
 

@@ -1,8 +1,9 @@
 const Eleve = require("../models/EleveModel");
+const AppError = require("../utils/appError");
 
 /**
- * Contrôleur gérant les opérations CRUD sur les Élèves.
- * @module EleveController
+ * @module controllers/EleveController
+ * @description Contrôleur gérant les opérations CRUD sur les Élèves.
  */
 
 /**
@@ -12,19 +13,15 @@ const Eleve = require("../models/EleveModel");
  * @function getEleves
  * @param {import('express').Request} req - L'objet de requête Express.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 200 avec le tableau des élèves, ou 500 en cas d'erreur.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 avec le tableau des élèves.
  */
-const getEleves = async (req, res) => {
+const getEleves = async (req, res, next) => {
   try {
     const liste = await Eleve.getAll();
     res.status(200).json(liste);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 
@@ -35,17 +32,16 @@ const getEleves = async (req, res) => {
  * @function addEleve
  * @param {import('express').Request} req - Les données de l'élève (`nom`, `prenom`, `email`, `password`, `identifiant_csv`).
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 201 avec l'ID du nouvel élève, ou 500 en cas d'erreur.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 201 avec l'ID du nouvel élève.
  */
-const addEleve = async (req, res) => {
+const addEleve = async (req, res, next) => {
   try {
     const data = req.body;
     const nouvelId = await Eleve.create(data);
     res.status(201).json({ message: "Élève créé avec succès !", id: nouvelId });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la création", detail: error.message });
+    next(error);
   }
 };
 
@@ -56,33 +52,24 @@ const addEleve = async (req, res) => {
  * @function updateEleve
  * @param {import('express').Request} req - Contient l'ID cible en `req.params.id` et les nouvelles données en `req.body`.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 200 si mis à jour, 404 si introuvable, ou 500 en cas d'erreur.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 si mis à jour.
+ * @throws {AppError} 404 - Si l'élève est introuvable.
  */
-const updateEleve = async (req, res) => {
+const updateEleve = async (req, res, next) => {
   try {
     const id = req.params.id;
     const data = req.body;
 
     const affectedRows = await Eleve.update(id, data);
 
-    // Si 0 ligne a été modifiée, c'est que l'ID n'existe pas dans la base de données
     if (affectedRows === 0) {
-      return res
-        .status(404)
-        .json({
-          message: "Élève introuvable ou aucune modification apportée.",
-        });
+      throw new AppError("Élève introuvable ou aucune modification apportée.", 404);
     }
 
-    // Si tout va bien, on renvoie un code 200
     res.status(200).json({ message: "Élève mis à jour avec succès !" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la mise à jour",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 
@@ -93,23 +80,20 @@ const updateEleve = async (req, res) => {
  * @function deleteEleve
  * @param {import('express').Request} req - L'ID de l'élève cible en `req.params.id`.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @returns {Promise<void>} 200 si succès, 404 si l'élève n'existait pas, 500 en cas d'erreur.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 si succès.
+ * @throws {AppError} 404 - Si l'élève n'existe pas.
  */
-const deleteEleve = async (req, res) => {
+const deleteEleve = async (req, res, next) => {
   try {
     const id = req.params.id;
     const affectedRows = await Eleve.delete(id);
     if (affectedRows === 0) {
-      return res.status(404).json({ message: "Élève introuvable." });
+      throw new AppError("Élève introuvable.", 404);
     }
     res.status(200).json({ message: "Élève supprimé avec succès !" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la suppression",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 

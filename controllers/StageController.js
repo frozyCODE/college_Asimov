@@ -1,8 +1,10 @@
 const Stage = require("../models/StageModel");
+const response = require("../utils/responseHelper");
+const AppError = require("../utils/appError");
 
 /**
- * Contrôleur traitant du processus d'orientation professionnelle et des stages obligatoires.
- * @module StageController
+ * @module controllers/StageController
+ * @description Contrôleur traitant du processus d'orientation professionnelle et des stages obligatoires.
  */
 
 /**
@@ -10,43 +12,39 @@ const Stage = require("../models/StageModel");
  *
  * @async
  * @function addRecherche
- * @param {import('express').Request} req - Contient `eleve_id`, `nom_entreprise`, `contact` etc.
- * @param {import('express').Response} res - L'objet de réponse.
- * @returns {Promise<void>} 201 avec l'ID du dossier créé, 500 en cas d'erreur.
+ * @param {import('express').Request} req - Données de la recherche dans `req.body`.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 201 avec l'ID du dossier créé.
  */
-const addRecherche = async (req, res) => {
+const addRecherche = async (req, res, next) => {
   try {
     const nouvelId = await Stage.addRecherche(req.body);
-    res
-      .status(201)
-      .json({ message: "Recherche de stage ajoutée !", id: nouvelId });
+    return response.success(res, 201, "Recherche de stage ajoutée !", {
+      id: nouvelId,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Erreur lors de l'ajout", detail: error.message });
+    next(error);
   }
 };
+
 /**
  * Surveiller les situations d'alerte (ex: stage toujours en attente proche de l'échéance).
  * Fonction destinée aux professeurs principaux ou direction.
  *
  * @async
  * @function getAlertes
- * @param {import('express').Request} req - L'objet de requête.
- * @param {import('express').Response} res - L'objet de réponse.
- * @returns {Promise<void>} 200 avec la liste globale des cas alarmants, 500 en cas de souci BD.
+ * @param {import('express').Request} req - L'objet de requête Express.
+ * @param {import('express').Response} res - L'objet de réponse Express.
+ * @param {import('express').NextFunction} next - Middleware suivant.
+ * @returns {Promise<void>} 200 avec la liste globale des cas alarmants.
  */
-const getAlertes = async (req, res) => {
+const getAlertes = async (req, res, next) => {
   try {
     const alertes = await Stage.getAlertes();
-    res.status(200).json(alertes);
+    return response.success(res, 200, "Liste des alertes récupérée.", alertes);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Erreur lors de la récupération des alertes",
-        detail: error.message,
-      });
+    next(error);
   }
 };
 

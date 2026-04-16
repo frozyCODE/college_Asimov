@@ -2,15 +2,15 @@ const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
 /**
- * Modèle pour interagir avec les données des Parents.
- * Gère la création synchronisée d'un Utilisateur/Parent et les liaisons avec les élèves.
  * @class ParentModel
+ * @description Modèle pour interagir avec les données des Parents. Gère la création synchronisée d'un Utilisateur/Parent et les liaisons avec les élèves.
  */
 class ParentModel {
   /**
    * Récupère la liste de tous les parents avec leurs informations de base.
    *
    * @async
+   * @static
    * @returns {Promise<Array<Object>>} Tableau contenant les parents (id, nom, prenom, email).
    */
   static async getAll() {
@@ -26,6 +26,7 @@ class ParentModel {
    * Utilise une transaction pour insérer dans `Utilisateurs` (rôle 'Parent') puis dans `Parents`.
    *
    * @async
+   * @static
    * @param {Object} data - Les données du parent.
    * @param {string} data.nom - Le nom du parent.
    * @param {string} data.prenom - Le prénom du parent.
@@ -67,6 +68,7 @@ class ParentModel {
    * Lie un parent à un élève spécifique dans la table de jointure `Eleve_Parent`.
    *
    * @async
+   * @static
    * @param {number|string} eleveId - L'ID de l'élève.
    * @param {number|string} parentId - L'ID du parent.
    * @returns {Promise<boolean>} TRUE si la liaison a réussi.
@@ -83,6 +85,7 @@ class ParentModel {
    * Récupère la liste des élèves affiliés à un parent spécifique.
    *
    * @async
+   * @static
    * @param {number|string} parentId - L'ID du parent.
    * @returns {Promise<Array<Object>>} Tableau contenant les ID, noms et prénoms des enfants.
    */
