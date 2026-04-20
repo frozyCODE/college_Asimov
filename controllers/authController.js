@@ -46,14 +46,18 @@ const login = async (req, res, next) => {
       expiresIn: process.env.JWT_EXPIRES_IN || "24h",
     });
 
-    return response.success(res, 200, "Connexion réussie !", {
-      token,
-      utilisateur: {
-        id: user.id,
-        nom: user.nom,
-        prenom: user.prenom,
-        email: user.email,
-        role: user.role,
+    return res.status(200).json({
+      success: true,
+      message: "Connexion réussie !",
+      data: {
+        token,
+        utilisateur: {
+          id: user.id,
+          nom: user.nom,
+          prenom: user.prenom,
+          email: user.email,
+          role: user.role,
+        },
       },
     });
   } catch (error) {
