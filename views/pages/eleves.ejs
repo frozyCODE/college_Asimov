@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr" class="bg-gray-50">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body class="flex flex-col min-h-screen text-gray-900 font-sans">
+  
+  <%- include('../partials/navbar', { currentRoute: '/eleves' }) %>
+
+  <script>
+    window.ROLE_UTILISATEUR = "<%= utilisateur.role %>";
+  </script>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-6 mt-4">
+    <div class="flex justify-between items-end border-b pb-4 mb-6">
+      <div>
+        <h1 class="text-3xl font-bold mb-1">Gestion des Élèves</h1>
+        <p class="text-gray-600">Base de données des élèves du collège</p>
+      </div>
+      <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+        <button onclick="ouvrirModalAjout()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 text-sm">
+          + Nouvel Élève
+        </button>
+      <% } %>
+    </div>
+
+    <!-- Recherche -->
+    <div class="bg-white p-4 border border-gray-300 mb-6 flex gap-2">
+      <input type="text" id="input-search-eleve" placeholder="Recherche par nom, prénom..." class="flex-1 px-3 py-2 border border-gray-300 focus:outline-none focus:border-blue-500 text-sm">
+      <button onclick="rechercherEleves()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 text-sm font-medium">Rechercher</button>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white border border-gray-300 overflow-x-auto">
+      <table class="w-full text-left border-collapse text-sm">
+        <thead class="bg-gray-100 border-b border-gray-300 text-gray-700">
+          <tr>
+            <th class="py-3 px-4 font-semibold border-r border-gray-300">ID</th>
+            <th class="py-3 px-4 font-semibold border-r border-gray-300">Élève</th>
+            <th class="py-3 px-4 font-semibold border-r border-gray-300">Email</th>
+            <th class="py-3 px-4 font-semibold border-r border-gray-300">CSV</th>
+            <th class="py-3 px-4 font-semibold">Prof. Réf.</th>
+            <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+              <th class="py-3 px-4 font-semibold text-right">Actions</th>
+            <% } %>
+          </tr>
+        </thead>
+        <tbody id="tbody-eleves" class="divide-y divide-gray-300">
+          <!-- Rempli en JS -->
+          <tr><td colspan="6" class="py-6 px-4 text-center text-gray-500">Appuyez sur Rechercher pour afficher.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <div id="notification-container" class="notification-container"></div>
+  <script src="/js/eleves.js"></script>
+
+  <!-- Simples modales JS gérées directement dans eleves.js pour ne pas encombrer l'EJS si besoin, ou on garde ici. -->
+  <div id="modal-eleve" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 border border-gray-400 w-full max-w-md">
+      <h3 class="text-xl font-bold mb-4" id="modal-eleve-title">Élève</h3>
+      <form id="form-eleve" class="space-y-4">
+        <input type="hidden" id="eleve-id" />
+        <div class="flex gap-4">
+          <div class="flex-1"><label class="block text-sm font-semibold mb-1">Nom *</label><input type="text" id="eleve-nom" required class="w-full border p-2 text-sm focus:border-blue-500"></div>
+          <div class="flex-1"><label class="block text-sm font-semibold mb-1">Prénom *</label><input type="text" id="eleve-prenom" required class="w-full border p-2 text-sm focus:border-blue-500"></div>
+        </div>
+        <div><label class="block text-sm font-semibold mb-1">Email *</label><input type="email" id="eleve-email" required class="w-full border p-2 text-sm focus:border-blue-500"></div>
+        <div><label class="block text-sm font-semibold mb-1">CSV</label><input type="text" id="eleve-csv" class="w-full border p-2 text-sm focus:border-blue-500"></div>
+        <div><label class="block text-sm font-semibold mb-1">ID Réf.</label><input type="number" id="eleve-ref" class="w-full border p-2 text-sm focus:border-blue-500"></div>
+        
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="fermerModalEleve()" class="bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300">Annuler</button>
+          <button type="submit" id="btn-submit-eleve" class="bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700">Sauver</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-confirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 border border-gray-400 max-w-sm text-center">
+      <h3 class="text-xl font-bold mb-2">Supprimer ?</h3>
+      <p class="text-sm mb-6">Action irréversible.</p>
+      <div class="flex justify-center gap-2">
+        <button onclick="fermerConfirm()" class="bg-gray-200 px-4 py-2 text-sm font-medium">Annuler</button>
+        <button id="btn-confirm-suppr" class="bg-red-600 text-white px-4 py-2 text-sm font-medium">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

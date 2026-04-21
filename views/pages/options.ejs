@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr" class="bg-gray-50">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body class="flex flex-col min-h-screen text-gray-900 font-sans">
+  
+  <%- include('../partials/navbar', { currentRoute: '/options' }) %>
+
+  <script>
+    window.ROLE_UTILISATEUR = "<%= utilisateur.role %>";
+  </script>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-6 mt-4">
+    <div class="flex justify-between items-end border-b pb-4 mb-6">
+      <div>
+        <h1 class="text-3xl font-bold mb-1">Options</h1>
+        <p class="text-gray-600">Référentiel des options disponibles.</p>
+      </div>
+      <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+        <button onclick="ouvrirModalOption()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 text-sm">
+          + Nouvelle Option
+        </button>
+      <% } %>
+    </div>
+
+    <!-- Container remanié pour le JS -->
+    <div id="grid-options" class="flex flex-col gap-4">
+      <p class="text-gray-500">Chargement...</p>
+    </div>
+  </main>
+
+  <div id="notification-container" class="notification-container"></div>
+  <script src="/js/options.js"></script>
+
+  <!-- Modal Nouvelle Option -->
+  <div id="modal-option" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 border border-gray-400 w-full max-w-sm">
+      <h3 class="text-xl font-bold mb-4">Ajouter une option</h3>
+      <form id="form-option" class="space-y-4">
+        <div><label class="block text-sm font-semibold mb-1">Nom *</label><input type="text" id="opt-nom" required class="w-full border p-2 text-sm"></div>
+        <div><label class="block text-sm font-semibold mb-1">Description</label><input type="text" id="opt-description" class="w-full border p-2 text-sm"></div>
+        
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="fermerModalOption()" class="bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300">Annuler</button>
+          <button type="submit" id="btn-submit-option" class="bg-green-600 text-white px-4 py-2 text-sm font-medium hover:bg-green-700">Ajouter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-confirmer-option" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 border border-gray-400 max-w-sm text-center">
+      <h3 class="text-xl font-bold mb-2">Supprimer ?</h3>
+      <div class="flex justify-center gap-2 mt-4">
+        <button onclick="fermerConfirmOption()" class="bg-gray-200 px-4 py-2 text-sm font-medium">Annuler</button>
+        <button id="btn-confirm-suppr-option" class="bg-red-600 text-white px-4 py-2 text-sm font-medium">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" class="bg-gray-50">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body class="flex flex-col min-h-screen text-gray-900 font-sans">
+  
+  <%- include('../partials/navbar', { currentRoute: '/dashboard' }) %>
+
+  <main class="flex-1 max-w-5xl w-full mx-auto p-6 mt-4">
+    <h1 class="text-3xl font-bold mb-2">Tableau de bord</h1>
+    <p class="text-gray-600 mb-8 border-b pb-4">Bienvenue, <%= utilisateur.prenom %> <%= utilisateur.nom %></p>
+
+    <div class="grid grid-cols-2 gap-6 mb-8">
+      <div class="bg-white p-6 border border-gray-300">
+        <h3 class="text-lg font-bold mb-1">Élèves</h3>
+        <p class="text-3xl" id="stat-eleves">-</p>
+      </div>
+      <div class="bg-white p-6 border border-gray-300">
+        <h3 class="text-lg font-bold mb-1">Options Actives</h3>
+        <p class="text-3xl" id="stat-options">-</p>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 border border-gray-300">
+      <h3 class="text-xl font-bold mb-4">Informations</h3>
+      <ul class="list-disc pl-5 text-gray-700 space-y-2">
+        <li>Mise à jour des conventions de stages pour les 3èmes.</li>
+        <li>Ouverture de la saisie des moyennes semestrielles.</li>
+        <li>Validation définitive des options par le secrétariat.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

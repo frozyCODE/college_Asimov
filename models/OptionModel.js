@@ -89,7 +89,7 @@ class OptionModel {
   static async getByEleve(eleveId) {
     const [rows] = await db.execute(
       `SELECT o.* FROM Options o
-       JOIN Eleve_Option eo ON o.id = eo.option_id
+       JOIN Eleve_Option eo ON o.id = eo.option_idx
        WHERE eo.eleve_id = ?`,
       [eleveId],
     );

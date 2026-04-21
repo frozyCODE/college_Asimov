@@ -13,8 +13,8 @@ const AppError = require("../utils/appError");
  * @function getEleves
  * @param {import('express').Request} req - L'objet de requête Express.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le tableau des élèves.
+ * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
+ * @returns {Promise<void>} 200 avec le tableau de tous les élèves.
  */
 const getEleves = async (req, res, next) => {
   try {
@@ -32,7 +32,7 @@ const getEleves = async (req, res, next) => {
  * @function addEleve
  * @param {import('express').Request} req - Les données de l'élève (`nom`, `prenom`, `email`, `password`, `identifiant_csv`).
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
+ * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
  * @returns {Promise<void>} 201 avec l'ID du nouvel élève.
  */
 const addEleve = async (req, res, next) => {
@@ -47,24 +47,43 @@ const addEleve = async (req, res, next) => {
 
 /**
  * Modifier les informations personnelles de base d'un élève.
+ * Les données entrantes sont nettoyées pour éviter les plantages SQL (remplacement de undefined par null).
  *
  * @async
  * @function updateEleve
  * @param {import('express').Request} req - Contient l'ID cible en `req.params.id` et les nouvelles données en `req.body`.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 si mis à jour.
- * @throws {AppError} 404 - Si l'élève est introuvable.
+ * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
+ * @returns {Promise<void>} 200 si la mise à jour a réussi.
+ * @throws {AppError} 404 - Si l'élève est introuvable ou si aucune modification n'a été apportée.
  */
 const updateEleve = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const data = req.body;
 
-    const affectedRows = await Eleve.update(id, data);
+    // 🛡️ SÉCURISATION DES DONNÉES :
+    // On extrait les valeurs de req.body. Si une valeur n'est pas fournie par le client (undefined),
+    // on force explicitement 'null' pour éviter l'erreur MySQL "Bind parameters must not contain undefined".
+    const safeData = {
+      nom: req.body.nom !== undefined ? req.body.nom : null,
+      prenom: req.body.prenom !== undefined ? req.body.prenom : null,
+      email: req.body.email !== undefined ? req.body.email : null,
+      referant: req.body.referant !== undefined ? req.body.referant : null,
+      // Ajout des autres champs potentiels mentionnés dans tes commentaires
+      identifiant_csv:
+        req.body.identifiant_csv !== undefined
+          ? req.body.identifiant_csv
+          : null,
+      password: req.body.password !== undefined ? req.body.password : null,
+    };
+
+    const affectedRows = await Eleve.update(id, safeData);
 
     if (affectedRows === 0) {
-      throw new AppError("Élève introuvable ou aucune modification apportée.", 404);
+      throw new AppError(
+        "Élève introuvable ou aucune modification apportée.",
+        404,
+      );
     }
 
     res.status(200).json({ message: "Élève mis à jour avec succès !" });
@@ -80,17 +99,19 @@ const updateEleve = async (req, res, next) => {
  * @function deleteEleve
  * @param {import('express').Request} req - L'ID de l'élève cible en `req.params.id`.
  * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 si succès.
+ * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
+ * @returns {Promise<void>} 200 si la suppression a réussi.
  * @throws {AppError} 404 - Si l'élève n'existe pas.
  */
 const deleteEleve = async (req, res, next) => {
   try {
     const id = req.params.id;
     const affectedRows = await Eleve.delete(id);
+
     if (affectedRows === 0) {
       throw new AppError("Élève introuvable.", 404);
     }
+
     res.status(200).json({ message: "Élève supprimé avec succès !" });
   } catch (error) {
     next(error);

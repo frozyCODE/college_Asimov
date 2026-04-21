@@ -1,0 +1,31 @@
+<nav class="bg-gray-900 text-white p-4 flex justify-between items-center">
+  <div class="flex items-center gap-6">
+    <a href="/dashboard" class="text-xl font-bold tracking-tight text-white hover:text-gray-300">ASIM'UT</a>
+    <ul class="flex gap-4 text-sm font-medium">
+      <li><a href="/dashboard" class="hover:underline <%= typeof currentRoute !== 'undefined' && currentRoute === '/dashboard' ? 'text-blue-400' : 'text-gray-300' %>">Accueil</a></li>
+      
+      <% if (typeof utilisateur !== 'undefined' && ['Professeur', 'Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+        <li><a href="/eleves" class="hover:underline <%= typeof currentRoute !== 'undefined' && currentRoute === '/eleves' ? 'text-blue-400' : 'text-gray-300' %>">Élèves</a></li>
+      <% } %>
+      
+      <li><a href="/moyennes" class="hover:underline <%= typeof currentRoute !== 'undefined' && currentRoute === '/moyennes' ? 'text-blue-400' : 'text-gray-300' %>">Moyennes</a></li>
+      
+      <% if (typeof utilisateur !== 'undefined' && ['Professeur', 'Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+        <li><a href="/inscriptions" class="hover:underline <%= typeof currentRoute !== 'undefined' && currentRoute === '/inscriptions' ? 'text-blue-400' : 'text-gray-300' %>">Inscriptions</a></li>
+      <% } %>
+      
+      <% if (typeof utilisateur !== 'undefined' && ['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+        <li><a href="/options" class="hover:underline <%= typeof currentRoute !== 'undefined' && currentRoute === '/options' ? 'text-blue-400' : 'text-gray-300' %>">Options</a></li>
+      <% } %>
+    </ul>
+  </div>
+
+  <div class="flex items-center gap-4 text-sm">
+    <% if (typeof utilisateur !== 'undefined') { %>
+      <span class="text-gray-400"><%= utilisateur.prenom %> <%= utilisateur.nom %> (<%= utilisateur.role %>)</span>
+    <% } %>
+    <form action="/logout" method="POST" class="inline">
+      <button type="submit" class="text-red-400 hover:text-red-300 hover:underline">Déconnexion</button>
+    </form>
+  </div>
+</nav>

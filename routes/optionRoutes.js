@@ -60,14 +60,14 @@ router.post(
 );
 
 /**
- * @route DELETE /api/options/retirer
+ * @route POST /api/options/retirer
  * @group Options - Gestion des options
  * @access Privat - Eleve, Secretariat, Proviseur
  * @param {Object} body.body - Données du retrait (eleve_id, option_id)
  * @returns {Object} 200 - Option retirée avec succès
  * @returns {Error} 500 - Erreur serveur
  */
-router.delete(
+router.post(
   "/retirer",
   autoriserRoles("Eleve", "Secretariat", "Proviseur"),
   optionController.desisterOption,

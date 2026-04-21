@@ -3,6 +3,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
+const session = require("express-session");
+const path = require("path");
 require("dotenv").config();
 
 /**
@@ -35,15 +37,51 @@ const moyenneRoutes = require("./routes/moyenneRoutes");
 const optionRoutes = require("./routes/optionRoutes");
 const parentRoutes = require("./routes/parentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const webRoutes = require("./routes/webRoutes");
 const { globalErrorHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
 
+// --- Moteur de templates EJS ---
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// --- Fichiers statiques (CSS, JS client) ---
+app.use(express.static(path.join(__dirname, "public")));
+
 // --- Sécurité & Logging ---
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false })); // CSP désactivé pour autoriser les styles/scripts inline EJS
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Pour les formulaires HTML POST
+
+// --- Session (authentification EJS) ---
+app.use(session({
+  secret: process.env.SESSION_SECRET || process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false, // Passer à true en production avec HTTPS
+    maxAge: 24 * 60 * 60 * 1000, // 24h
+  },
+}));
+
+// --- Injection automatique du token JWT de session dans les appels /api/ ---
+// Les pages EJS font des fetch() vers /api/* ; ce middleware injecte
+// le token stocké dans la session dans l'en-tête Authorization.
+app.use("/api", (req, res, next) => {
+  if (
+    req.session &&
+    req.session.utilisateur &&
+    req.session.utilisateur.token &&
+    !req.headers["authorization"]
+  ) {
+    req.headers["authorization"] = `Bearer ${req.session.utilisateur.token}`;
+  }
+  next();
+});
 
 // --- Rate Limiting sur l'authentification ---
 const loginLimiter = rateLimit({
@@ -57,7 +95,7 @@ const loginLimiter = rateLimit({
   },
 });
 
-// --- Routes ---
+// --- Routes API ---
 app.use("/api/auth", loginLimiter, authRoutes);
 app.use("/api/eleves", eleveRoutes);
 app.use("/api/professeurs", professeurRoutes);
@@ -67,6 +105,9 @@ app.use("/api/moyennes", moyenneRoutes);
 app.use("/api/options", optionRoutes);
 app.use("/api/parents", parentRoutes);
 app.use("/api/admin", adminRoutes);
+
+// --- Routes Web (EJS) ---
+app.use("/", webRoutes);
 
 // --- Middleware global de gestion des erreurs (doit être en DERNIER) ---
 app.use(globalErrorHandler);
