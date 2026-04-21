@@ -46,14 +46,11 @@ router.get(
 );
 
 /**
- * @route PATCH /api/moyennes/:id/valider
+ * @route PUT /api/moyennes/:id/valider
  * @group Moyennes - Gestion des notes
  * @access Privat - Seul Proviseur
- * @param {string} id.path.required - ID de la moyenne
- * @returns {Object} 200 - Moyenne validée avec succès
- * @returns {Error} 500 - Erreur serveur
  */
-router.patch(
+router.put(
   "/:id/valider",
   autoriserRoles("Proviseur"),
   moyenneController.validerMoyenne,
