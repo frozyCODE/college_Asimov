@@ -18,8 +18,23 @@ const AppError = require("../utils/appError");
  */
 const getEleves = async (req, res, next) => {
   try {
-    const liste = await Eleve.getAll();
-    res.status(200).json(liste);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
+    const [liste, total] = await Promise.all([
+      Eleve.getPaginated(page, limit),
+      Eleve.count(),
+    ]);
+
+    res.status(200).json({
+      data: liste,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     next(error);
   }

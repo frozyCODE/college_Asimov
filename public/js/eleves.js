@@ -5,6 +5,8 @@
 let eleveIdASupprimer = null;
 let tousLesEleves     = [];
 let modeEdition       = false;
+let pageActuelle      = 1;
+let totalPages        = 1;
 
 /* ======================================================
    INITIALISATION
@@ -24,16 +26,46 @@ document.addEventListener('DOMContentLoaded', async () => {
 /* ======================================================
    CHARGEMENT
    ====================================================== */
-async function chargerEleves() {
+async function chargerEleves(page = 1) {
   try {
-    const res = await fetch('/api/eleves');
+    const res = await fetch(`/api/eleves?page=${page}&limit=20`);
     if (!res.ok) throw new Error('Accès refusé ou erreur serveur');
-    tousLesEleves = await res.json();
+    const result = await res.json();
+    console.log('DEBUG Eleves API:', result);
+    
+    if (!result || !result.meta) {
+        // Fallback for old API format or missing meta
+        tousLesEleves = Array.isArray(result) ? result : (result.data || []);
+        pageActuelle  = 1;
+        totalPages    = 1;
+        document.getElementById('total-eleves').textContent = tousLesEleves.length;
+    } else {
+        tousLesEleves = result.data;
+        pageActuelle  = result.meta.page;
+        totalPages    = result.meta.totalPages;
+        document.getElementById('total-eleves').textContent = result.meta.total;
+    }
+
+    // Update UI
+    document.getElementById('current-page').textContent = pageActuelle;
+    document.getElementById('total-pages').textContent  = totalPages;
+    
+    document.getElementById('btn-prev').disabled = (pageActuelle <= 1);
+    document.getElementById('btn-next').disabled = (pageActuelle >= totalPages);
+
     afficherEleves(tousLesEleves);
   } catch (err) {
+    console.error('CRASH Eleves:', err);
     afficherNotification('Impossible de charger les élèves : ' + err.message, 'error');
     document.getElementById('tbody-eleves').innerHTML = `
       <tr><td colspan="6" class="text-center text-muted">Aucune donnée disponible.</td></tr>`;
+  }
+}
+
+function changerPage(direction) {
+  const nouvellePage = pageActuelle + direction;
+  if (nouvellePage >= 1 && nouvellePage <= totalPages) {
+    chargerEleves(nouvellePage);
   }
 }
 
@@ -73,14 +105,15 @@ function afficherEleves(liste) {
       ${peutModifier ? `
       <td class="py-10 px-6 text-right last:pr-8">
         <div class="flex items-center justify-end gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
-          <button onclick='ouvrirModalModification(${JSON.stringify(e).replace(/'/g, "&#39;")})' class="p-2 bg-white/5 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Modifier">
+          <button onclick="ouvrirModalEdition(${e.id})" class="p-2 bg-white/5 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all" title="Modifier">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
           </button>
           <button onclick="demanderSuppression(${e.id})" class="p-2 bg-white/5 text-white/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Supprimer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
           </button>
         </div>
-      </td>` : ''}
+      </td>
+` : ''}
     </tr>
   `).join('');
 }

@@ -28,16 +28,13 @@
     <div class="bg-white/5 border border-white/10 p-6 rounded-2xl mb-12 flex gap-4">
       <div class="flex-1 relative group">
         <svg class="w-5 h-5 absolute left-6 top-1/2 -translate-y-1/2 text-asimov-textMuted group-focus-within:text-asimov-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-        <input type="text" id="input-search-eleve" placeholder="Recherche par nom, prénom..." 
+        <input type="text" id="recherche-eleve" placeholder="Recherche par nom, prénom..." 
                class="w-full pl-16 pr-6 py-4 bg-white/5 border border-white/5 rounded-xl focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm placeholder-white/20">
       </div>
-      <button onclick="rechercherEleves()" class="px-10 py-4 bg-white/10 hover:bg-white/20 text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all border border-white/10">
-        Rechercher
-      </button>
     </div>
 
     <!-- Table Area -->
-    <div class="mt-12">
+    <div class="mt-12 bg-white/[0.02] border border-white/5 rounded-[2.5rem] overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
@@ -54,9 +51,27 @@
           </thead>
           <tbody id="tbody-eleves" class="divide-y divide-white/[0.03]">
             <!-- Rempli en JS -->
-            <tr><td colspan="6" class="py-32 px-6 text-center text-asimov-textMuted uppercase tracking-widest text-[10px] first:pl-0">Utilisez la recherche pour extraire les données...</td></tr>
+            <tr><td colspan="6" class="py-32 px-6 text-center text-asimov-textMuted uppercase tracking-widest text-[10px] first:pl-0">Synchronisation des données...</td></tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="px-8 py-6 bg-white/[0.02] border-t border-white/5 flex items-center justify-between">
+        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+          Total : <span id="total-eleves" class="text-asimov-accent">...</span> élèves
+        </div>
+        <div class="flex items-center gap-6">
+          <button id="btn-prev" onclick="changerPage(-1)" class="p-2 text-white/40 hover:text-asimov-accent disabled:opacity-10 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
+          <div class="text-[10px] font-black underline decoration-asimov-accent decoration-2 underline-offset-4 uppercase tracking-[0.3em]">
+            Page <span id="current-page">1</span> / <span id="total-pages">1</span>
+          </div>
+          <button id="btn-next" onclick="changerPage(1)" class="p-2 text-white/40 hover:text-asimov-accent disabled:opacity-10 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -67,7 +82,7 @@
   <!-- Modales avec style Premium Dark -->
   <div id="modal-eleve" class="fixed inset-0 bg-asimov-bg/80 backdrop-blur-xl flex items-center justify-center hidden z-[200] p-6">
     <div class="glass p-12 rounded-[2.5rem] shadow-glow-lg w-full max-w-xl border border-white/10">
-      <h3 class="text-3xl font-black uppercase tracking-tighter mb-10" id="modal-eleve-title">Élève</h3>
+      <h3 class="text-3xl font-black uppercase tracking-tighter mb-10" id="modal-title">Élève</h3>
       <form id="form-eleve" class="grid gap-8">
         <input type="hidden" id="eleve-id" />
         <div class="grid grid-cols-2 gap-6">
@@ -84,6 +99,13 @@
           <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">Email académique *</label>
           <input type="email" id="eleve-email" required class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm">
         </div>
+
+        <!-- Section Password (uniquement à l'ajout) -->
+        <div id="group-password" class="space-y-2">
+          <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">Mot de passe provisoire *</label>
+          <input type="password" id="eleve-password" class="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm">
+        </div>
+
         <div class="grid grid-cols-2 gap-6">
           <div class="space-y-2">
             <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">Code CSV</label>
@@ -96,7 +118,7 @@
         </div>
         
         <div class="pt-6 flex justify-end gap-4">
-          <button type="button" onclick="fermerModalEleve()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-white/10 transition-colors">Annuler</button>
+          <button type="button" onclick="fermerModal()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-white/10 transition-colors">Annuler</button>
           <button type="submit" id="btn-submit-eleve" class="px-10 py-4 bg-asimov-accent text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-glow transition-all">Enregistrer</button>
         </div>
       </form>
@@ -111,7 +133,7 @@
       <h3 class="text-3xl font-black uppercase tracking-tighter mb-4">Supprimer ?</h3>
       <p class="text-asimov-textMuted text-sm font-medium mb-12">L'action est irréversible. Les données de l'élève seront effacées des serveurs.</p>
       <div class="flex justify-center gap-4">
-        <button onclick="fermerConfirm()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-2xl">Annuler</button>
+        <button onclick="fermerConfirmation()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-2xl">Annuler</button>
         <button id="btn-confirm-suppr" class="px-10 py-4 bg-red-600 text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-[0_0_30px_rgba(220,38,38,0.3)] transition-all hover:bg-red-700">Confirmer</button>
       </div>
     </div>

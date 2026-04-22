@@ -24,6 +24,30 @@ class EleveModel {
     }
 
     /**
+     * Récupère une page d'élèves.
+     */
+    static async getPaginated(page = 1, limit = 20) {
+        const offset = (page - 1) * limit;
+        const [rows] = await db.execute(`
+            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv 
+            FROM Eleves e
+            JOIN Utilisateurs u ON e.utilisateur_id = u.id
+            ORDER BY u.nom ASC, u.prenom ASC
+            LIMIT ? OFFSET ?`, 
+            [limit, offset]
+        );
+        return rows;
+    }
+
+    /**
+     * Compte le nombre total d'élèves.
+     */
+    static async count() {
+        const [rows] = await db.execute(`SELECT COUNT(*) as total FROM Eleves`);
+        return rows[0].total;
+    }
+
+    /**
      * Crée un nouvel élève dans le système (Utilisateur + Profil Élève).
      * Utilise une transaction SQL pour garantir que le profil et le compte sont créés simultanément.
      * 

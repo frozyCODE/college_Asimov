@@ -28,6 +28,18 @@ const createMoyenne = async (req, res, next) => {
       );
     }
 
+    // --- SÉCURITÉ : UNICITÉ PAR SEMESTRE ---
+    const existante = await Moyenne.findByInscriptionAndSemester(
+      inscription_id,
+      semestre,
+    );
+    if (existante) {
+      throw new AppError(
+        `Une moyenne existe déjà pour le semestre ${semestre} dans ce dossier.`,
+        400,
+      );
+    }
+
     const nouvelId = await Moyenne.create({
       inscription_id,
       semestre,
@@ -89,8 +101,37 @@ const validerMoyenne = async (req, res, next) => {
   }
 };
 
+/**
+ * Supprimer une moyenne semestrielle.
+ * Action réservée au Proviseur uniquement.
+ *
+ * @async
+ * @function deleteMoyenne
+ * @param {import('express').Request} req - L'ID en params. req.user doit être chargé par le middleware d'auth.
+ */
+const deleteMoyenne = async (req, res, next) => {
+  try {
+    // Vérification du rôle Proviseur (SÉCURITÉ SUPPLÉMENTAIRE)
+    if (req.user.role !== "Proviseur") {
+      throw new AppError("Action réservée au Proviseur.", 403);
+    }
+
+    const { id } = req.params;
+    const affectedRows = await Moyenne.delete(id);
+
+    if (affectedRows === 0) {
+      throw new AppError("Moyenne introuvable.", 404);
+    }
+
+    res.status(200).json({ message: "Moyenne supprimée avec succès !" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createMoyenne,
   getMoyennesByInscription,
   validerMoyenne,
+  deleteMoyenne,
 };

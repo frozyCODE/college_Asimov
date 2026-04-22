@@ -49,4 +49,15 @@ router.patch(
   moyenneController.validerMoyenne,
 );
 
+/**
+ * @route DELETE /api/moyennes/:id
+ * @desc Supprimer une moyenne générale (Correction d'erreur grave)
+ * @access Proviseur uniquement
+ */
+router.delete(
+  "/:id",
+  autoriserRoles("Proviseur"),
+  moyenneController.deleteMoyenne,
+);
+
 module.exports = router;

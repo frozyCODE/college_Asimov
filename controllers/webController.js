@@ -1,4 +1,6 @@
 const Utilisateur = require("../models/userModel");
+const Classe      = require("../models/ClasseModel");
+const Eleve       = require("../models/EleveModel");
 const bcrypt      = require("bcrypt");
 const jwt         = require("jsonwebtoken");
 
@@ -161,6 +163,30 @@ const getOptions = (req, res) => {
   res.render("pages/options", { utilisateur: req.session.utilisateur });
 };
 
+/** Page classes management */
+const getClasses = async (req, res) => {
+  const { role } = req.session.utilisateur;
+  if (!["Professeur", "Secretariat", "Proviseur"].includes(role)) {
+    return res.redirect("/dashboard");
+  }
+  try {
+    const classes = await Classe.findAll();
+    const eleves  = await Eleve.getAll();
+    res.render("pages/classes", { 
+      utilisateur: req.session.utilisateur, 
+      classes, 
+      eleves 
+    });
+  } catch (err) {
+    console.error(err);
+    res.render("pages/classes", { 
+      utilisateur: req.session.utilisateur, 
+      classes: [], 
+      eleves: [] 
+    });
+  }
+};
+
 /** Page inscriptions */
 const getInscriptions = (req, res) => {
   const { role } = req.session.utilisateur;
@@ -187,6 +213,7 @@ module.exports = {
   getEleves,
   getMoyennes,
   getOptions,
+  getClasses,
   getInscriptions,
   getAsimov,
 };

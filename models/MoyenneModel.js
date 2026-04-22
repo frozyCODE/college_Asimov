@@ -33,6 +33,22 @@ class MoyenneModel {
     );
     return rows;
   }
+
+  static async findByInscriptionAndSemester(inscription_id, semestre) {
+    const [rows] = await db.execute(
+      "SELECT * FROM Moyennes_Semestrielles WHERE inscription_id = ? AND semestre = ?",
+      [inscription_id, semestre],
+    );
+    return rows[0] || null;
+  }
+
+  static async delete(id) {
+    const [result] = await db.execute(
+      "DELETE FROM Moyennes_Semestrielles WHERE id = ?",
+      [id],
+    );
+    return result.affectedRows;
+  }
 }
 
 module.exports = MoyenneModel;
