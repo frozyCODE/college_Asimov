@@ -58,14 +58,32 @@ function afficherInscriptions(liste, eleveId) {
   }
 
   tbody.innerHTML = liste.map((insc) => `
-    <tr class="border-b border-gray-200">
-      <td class="py-2 px-4 border-r border-gray-200">${insc.id}</td>
-      <td class="py-2 px-4 border-r border-gray-200">${escapeHtml(insc.annee_scolaire || '—')}</td>
-      <td class="py-2 px-4 border-r border-gray-200">${escapeHtml(insc.niveau ? insc.niveau + 'ème' : '—')}</td>
-      <td class="py-2 px-4 border-r border-gray-200">${escapeHtml(insc.niveau && insc.lettre_classe ? insc.niveau + 'ème ' + insc.lettre_classe : insc.lettre_classe || '—')}</td>
+    <tr class="group hover:bg-white/[0.02] transition-colors">
+      <td class="py-10 px-6 first:pl-8">
+        <span class="text-[10px] font-mono text-asimov-accent font-bold uppercase tracking-widest">#${insc.id}</span>
+      </td>
+      <td class="py-10 px-6">
+        <div class="flex flex-col">
+          <span class="text-sm font-clean font-bold text-white">ID Élève #${eleveId}</span>
+          <span class="text-[9px] font-black uppercase tracking-widest text-white/30 mt-1">Dossier Actif</span>
+        </div>
+      </td>
+      <td class="py-10 px-6">
+        <div class="flex flex-col">
+          <span class="text-lg font-clean font-black text-white leading-tight uppercase">${escapeHtml(insc.niveau && insc.lettre_classe ? insc.niveau + 'ème ' + insc.lettre_classe : insc.lettre_classe || '—')}</span>
+          <span class="text-[9px] font-black uppercase tracking-widest text-white/30 mt-1">${escapeHtml(insc.annee_scolaire || '—')}</span>
+        </div>
+      </td>
+      <td class="py-10 px-6">
+        <span class="px-3 py-1 bg-asimov-accent/10 border border-asimov-accent/20 rounded-lg text-[10px] font-black uppercase tracking-widest text-asimov-accent">Inscrit</span>
+      </td>
       ${peutModifier ? `
-      <td class="py-2 px-4 text-right">
-        <button onclick="demanderSuppressionInsc(${insc.id})" class="text-red-600 hover:underline text-sm font-medium">Supprimer</button>
+      <td class="py-10 px-6 text-right last:pr-8">
+        <div class="flex items-center justify-end gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
+          <button onclick="demanderSuppressionInsc(${insc.id})" class="p-2 bg-white/5 text-white/50 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Désinscrire">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        </div>
       </td>` : ''}
     </tr>
   `).join('');

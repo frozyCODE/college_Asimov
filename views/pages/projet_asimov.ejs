@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <%- include('../partials/head', { title: "Le Projet Asimov" }) %>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hero-gradient {
+            background: radial-gradient(circle at top right, #00DC82, #064E3B 70%);
+        }
+    </style>
+</head>
+<body class="bg-asimov-bg text-white font-sans selection:bg-asimov-accent/30 flex flex-col min-h-screen">
+
+    <%- include('../partials/navbar', { currentRoute: '/projet-asimov' }) %>
+
+    <main class="flex-1">
+        <!-- Hero Section -->
+        <section class="relative h-screen flex flex-col items-center justify-center overflow-hidden px-6">
+            <!-- Background Glows -->
+            <div class="absolute top-[20%] left-[10%] w-[40vw] h-[40vw] bg-asimov-accent/10 blur-[150px] -z-10 animate-pulse"></div>
+            <div class="absolute bottom-[20%] right-[10%] w-[30vw] h-[30vw] bg-asimov-accent/5 blur-[120px] -z-10 animae-pulse" style="animation-delay: 2s"></div>
+            
+            <div class="max-w-6xl mx-auto relative z-10 text-center">
+                <div class="flex flex-col items-center mt-12 mb-20 pointer-events-none select-none">
+                    <h1 class="text-[12vw] font-wide font-black uppercase leading-[0.8] tracking-[-0.05em] text-white">
+                        LE PROJET
+                    </h1>
+                    <h1 class="text-[15vw] font-wide font-black uppercase leading-[0.8] tracking-[-0.02em] text-outline-accent -mt-[0.1em]">
+                        ASIMOV
+                    </h1>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-6 mt-12">
+                    <a href="/dashboard" class="px-10 py-5 bg-asimov-accent hover:bg-asimov-accentHover text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all transform hover:-translate-y-1 active:scale-[0.98]">
+                        Découvrir l'Espace
+                    </a>
+                    <a href="#vision" class="px-10 py-5 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-xl border border-white/5 hover:bg-white/10 transition-all">
+                        Notre Vision
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Grid Section -->
+        <section class="py-40 px-8 bg-asimov-bgSecondary relative overflow-hidden">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-20">
+                    <div class="md:col-span-5 flex flex-col justify-center">
+                        <div class="w-16 h-2 bg-asimov-accent mb-10"></div>
+                        <h2 class="text-6xl font-wide font-black uppercase mb-10 leading-[0.8] tracking-widest">Technique.<br/><span class="text-outline-accent">Visuelle.</span></h2>
+                        <p class="text-asimov-textMuted text-lg font-medium leading-relaxed mb-8">
+                            Nous ne construisons pas juste un logiciel. Nous concevons le pivot numérique de l'éducation. Un écosystème où chaque pixel sert l'apprentissage et chaque ligne de code protège l'avenir.
+                        </p>
+                    </div>
+                    <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <div class="glass p-12 rounded-3xl group hover:border-asimov-accent/30 transition-all">
+                            <span class="text-3xl font-black text-asimov-accent mb-6 block">01.</span>
+                            <h3 class="text-xl font-black uppercase tracking-tight mb-4">Architecture REST</h3>
+                            <p class="text-asimov-textMuted text-sm leading-relaxed">Infrastructure Node.js ultra-rapide pour une réactivité instantanée entre les modèles et les vues.</p>
+                        </div>
+                        <div class="glass p-12 rounded-3xl group hover:border-asimov-accent/30 transition-all mt-12 md:mt-24">
+                            <span class="text-3xl font-black text-asimov-accent mb-6 block">02.</span>
+                            <h3 class="text-xl font-black uppercase tracking-tight mb-4">Sécurité JWT</h3>
+                            <p class="text-asimov-textMuted text-sm leading-relaxed">Cryptage des sessions serveurs pour garantir que seule l'administration accède aux dossiers sensibles.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features - Editorial Style -->
+        <section class="py-40 px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col mb-24">
+                    <div class="w-32 h-3 bg-white/10 mb-8"></div>
+                    <h2 class="text-7xl font-wide font-black uppercase tracking-widest">Les Piliers</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-1px bg-white/5 border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+                    <div class="p-16 bg-asimov-bg hover:bg-white/[0.02] transition-colors group">
+                        <div class="w-16 h-16 bg-asimov-accent/10 text-asimov-accent rounded-2xl flex items-center justify-center mb-8 group-hover:shadow-glow transition-all">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <h4 class="text-2xl font-black uppercase tracking-tight mb-6">Élèves</h4>
+                        <p class="text-asimov-textMuted text-sm leading-relaxed mb-10">Centralisation des profils et suivi des badges de compétences en temps réel.</p>
+                        <div class="w-8 h-[2px] bg-white/10 group-hover:w-full group-hover:bg-asimov-accent transition-all duration-700"></div>
+                    </div>
+                    <div class="p-16 bg-asimov-bg hover:bg-white/[0.02] transition-colors group">
+                        <div class="w-16 h-16 bg-asimov-accent/10 text-asimov-accent rounded-2xl flex items-center justify-center mb-8 group-hover:shadow-glow transition-all">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <h4 class="text-2xl font-black uppercase tracking-tight mb-6">Pédagogie</h4>
+                        <p class="text-asimov-textMuted text-sm leading-relaxed mb-10">Saisie des notes assistée et calcul automatique des moyennes avec histogrammes.</p>
+                        <div class="w-8 h-[2px] bg-white/10 group-hover:w-full group-hover:bg-asimov-accent transition-all duration-700"></div>
+                    </div>
+                    <div class="p-16 bg-asimov-bg hover:bg-white/[0.02] transition-colors group">
+                        <div class="w-16 h-16 bg-asimov-accent/10 text-asimov-accent rounded-2xl flex items-center justify-center mb-8 group-hover:shadow-glow transition-all">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h4 class="text-2xl font-black uppercase tracking-tight mb-6">Stages</h4>
+                        <p class="text-asimov-textMuted text-sm leading-relaxed mb-10">Mise en relation intelligente et suivi des conventions administratives.</p>
+                        <div class="w-8 h-[2px] bg-white/10 group-hover:w-full group-hover:bg-asimov-accent transition-all duration-700"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-40 px-8 text-center bg-asimov-bgSecondary">
+            <h2 class="text-7xl font-wide tracking-widest uppercase mb-16">Accéder au Futur.</h2>
+            <a href="/dashboard" class="px-20 py-8 bg-asimov-accent hover:bg-asimov-accentHover text-white text-xl font-black uppercase tracking-[0.4em] rounded-2xl transition-all inline-block hover:scale-105 active:scale-95">
+                Rejoindre le Portail
+            </a>
+        </section>
+    </main>
+
+    <footer class="py-20 px-8 bg-asimov-bg border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+            <div class="flex flex-col gap-2">
+                <span class="text-2xl font-black tracking-tighter uppercase">Asimov</span>
+                <span class="text-[10px] font-bold text-asimov-textMuted uppercase tracking-widest">Éducation & Technologie</span>
+            </div>
+            <p class="text-asimov-textMuted text-xs font-bold uppercase tracking-widest">© 2026 GABRIEL DSP • DESIGN ARCHITECTURE</p>
+            <div class="flex gap-10">
+                <a href="#" class="text-[10px] font-bold text-asimov-textMuted hover:text-white uppercase tracking-widest transition-colors">Github</a>
+                <a href="#" class="text-[10px] font-bold text-asimov-textMuted hover:text-white uppercase tracking-widest transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

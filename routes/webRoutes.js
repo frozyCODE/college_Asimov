@@ -12,6 +12,7 @@ const webController = require("../controllers/webController");
 router.get("/login", webController.getLogin);
 router.post("/login", webController.postLogin);
 router.post("/logout", webController.logout);
+router.get("/projet-asimov", webController.getAsimov);
 
 /* ─── Pages protégées ────────────────────── */
 router.get("/", webController.requireSession, webController.getDashboard);

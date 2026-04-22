@@ -170,6 +170,14 @@ const getInscriptions = (req, res) => {
   res.render("pages/inscriptions", { utilisateur: req.session.utilisateur });
 };
 
+/** Page présentation du Projet Asimov */
+const getAsimov = (req, res) => {
+  res.render("pages/projet_asimov", { 
+    utilisateur: req.session.utilisateur,
+    title: "Le Projet Asimov"
+  });
+};
+
 module.exports = {
   requireSession,
   getLogin,
@@ -180,4 +188,5 @@ module.exports = {
   getMoyennes,
   getOptions,
   getInscriptions,
+  getAsimov,
 };

@@ -61,20 +61,37 @@ function afficherMoyennes(liste, inscId) {
 
   tbody.innerHTML = liste.map((moy) => {
     let statusText  = moy.validee_par_proviseur ? 'Validée' : 'En attente';
+    let statusColor = moy.validee_par_proviseur ? 'text-asimov-accent' : 'text-asimov-textMuted';
 
     return `
-    <tr class="border-b border-gray-200">
-      <td class="py-2 px-4 border-r border-gray-200">S${moy.semestre}</td>
-      <td class="py-2 px-4 border-r border-gray-200 font-bold">${Number(moy.moyenne_generale).toFixed(2)}</td>
-      <td class="py-2 px-4 border-r border-gray-200">${statusText}</td>
-      ${peutValider ? `
-      <td class="py-2 px-4 text-right">
+    <tr class="group hover:bg-white/[0.02] transition-colors">
+      <td class="py-10 px-6 first:pl-8">
+        <span class="text-[10px] font-mono text-asimov-accent/70 uppercase tracking-widest">#${moy.id}</span>
+      </td>
+      <td class="py-10 px-6">
+        <span class="text-sm font-clean font-bold text-white">ID Insc. ${moy.inscription_id}</span>
+      </td>
+      <td class="py-10 px-6">
+        <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-white/50">Semestre ${moy.semestre}</span>
+      </td>
+      <td class="py-10 px-6">
+        <span class="text-2xl font-clean font-black text-white leading-none">${Number(moy.moyenne_generale).toFixed(2)}</span>
+        <span class="text-[10px] font-bold text-white/30 ml-1">/20</span>
+      </td>
+      ${ROLE_UTILISATEUR === 'Proviseur' ? `
+      <td class="py-10 px-6 text-right last:pr-8">
         ${!moy.validee_par_proviseur ? `
-        <button onclick="validerMoyenne(${moy.id})" class="text-green-600 hover:underline text-sm font-medium">Valider</button>
+          <button onclick="validerMoyenne(${moy.id})" class="px-6 py-2 bg-asimov-accent/10 border border-asimov-accent/30 text-asimov-accent hover:bg-asimov-accent hover:text-white rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">Valider</button>
         ` : `
-        <span class="text-green-600 font-bold uppercase text-xs">V</span>
+          <div class="flex items-center justify-end gap-2 text-asimov-accent">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            <span class="text-[9px] font-black uppercase tracking-[0.2em]">Archivé</span>
+          </div>
         `}
-      </td>` : ''}
+      </td>` : (ROLE_UTILISATEUR === 'Secretariat' ? `
+      <td class="py-10 px-6 text-right last:pr-8">
+         <span class="text-[9px] font-black uppercase tracking-[0.2em] ${statusColor}">${statusText}</span>
+      </td>` : '')}
     </tr>`;
   }).join('');
 }

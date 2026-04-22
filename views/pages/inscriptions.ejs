@@ -3,7 +3,7 @@
 <head>
   <%- include('../partials/head') %>
 </head>
-<body class="flex flex-col min-h-screen text-gray-900 font-sans">
+<body class="bg-asimov-bg text-white font-sans selection:bg-asimov-accent/30 flex flex-col min-h-screen">
   
   <%- include('../partials/navbar', { currentRoute: '/inscriptions' }) %>
 
@@ -11,74 +11,98 @@
     window.ROLE_UTILISATEUR = "<%= utilisateur.role %>";
   </script>
 
-  <main class="flex-1 max-w-6xl w-full mx-auto p-6 mt-4">
-    <div class="flex justify-between items-end border-b pb-4 mb-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-12">
+    <header class="flex justify-between items-center mb-16">
       <div>
-        <h1 class="text-3xl font-bold mb-1">Inscriptions</h1>
-        <p class="text-gray-600">Affectez les élèves dans leurs classes respectives.</p>
+        <p class="text-asimov-accent text-[10px] font-black uppercase tracking-[0.4em] mb-4">Administration</p>
+        <h1 class="text-6xl font-black tracking-tighter uppercase">Inscriptions</h1>
       </div>
       <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
-        <button onclick="ouvrirModalInscription()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 text-sm">
+        <button onclick="ouvrirModalAjoutInscription()" class="px-8 py-4 bg-asimov-accent hover:bg-asimov-accentHover text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all active:scale-[0.98]">
           + Nouvelle Inscription
         </button>
       <% } %>
+    </header>
+
+    <!-- Recherche -->
+    <div class="bg-white/5 border border-white/10 p-6 rounded-2xl mb-12 flex gap-4">
+      <div class="flex-1 relative group">
+        <svg class="w-5 h-5 absolute left-6 top-1/2 -translate-y-1/2 text-asimov-textMuted group-focus-within:text-asimov-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        <input type="number" id="input-eleve-id" min="1" placeholder="Rechercher par ID élève..." 
+               class="w-full pl-16 pr-6 py-4 bg-white/5 border border-white/5 rounded-xl focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm placeholder-white/20">
+      </div>
+      <button onclick="rechercherInscriptions()" class="px-10 py-4 bg-white/10 hover:bg-white/20 text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all border border-white/10">
+        Rechercher
+      </button>
     </div>
 
-    <!-- Recherche Inscriptions -->
-    <div class="bg-white p-4 border border-gray-300 mb-6 flex gap-2">
-      <input type="number" id="input-eleve-id" min="1" placeholder="ID élève (ex: 1)" class="flex-1 px-3 py-2 border border-gray-300 focus:outline-none focus:border-blue-500 text-sm">
-      <button id="btn-rechercher-insc" onclick="rechercherInscriptions()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 text-sm font-medium">Rechercher</button>
-    </div>
-
-    <!-- Table -->
-    <div class="bg-white border border-gray-300 overflow-x-auto">
-      <table class="w-full text-left border-collapse text-sm">
-        <thead class="bg-gray-100 border-b border-gray-300 text-gray-700">
-          <tr>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">ID Inscr.</th>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">Année Scolaire</th>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">Niveau</th>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">Classe</th>
-            <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
-              <th class="py-3 px-4 font-semibold text-right">Actions</th>
-            <% } %>
-          </tr>
-        </thead>
-        <tbody id="tbody-inscriptions" class="divide-y divide-gray-300">
-          <tr><td colspan="5" class="py-6 px-4 text-center text-gray-500">Entrez un ID d'élève.</td></tr>
-        </tbody>
-      </table>
+    <!-- Table Area -->
+    <div class="mt-12">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/10 bg-white/[0.03] text-white/70">
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px] first:pl-8">ID</th>
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px]">Candidat</th>
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px]">Promotion</th>
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px]">Statut</th>
+              <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+                <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px] text-right last:pr-8">Actions</th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody id="tbody-inscriptions" class="divide-y divide-white/[0.03]">
+            <!-- Rempli en JS -->
+            <tr><td colspan="5" class="py-32 px-6 text-center text-asimov-textMuted uppercase tracking-widest text-[10px] first:pl-0">Initialisation du registre des dossiers...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 
   <div id="notification-container" class="notification-container"></div>
   <script src="/js/inscriptions.js"></script>
 
-  <!-- Modal Nouvelle Inscription -->
-  <div id="modal-inscription" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white p-6 border border-gray-400 w-full max-w-sm">
-      <h3 class="text-xl font-bold mb-4">Inscrire un élève</h3>
-      <form id="form-inscription" class="space-y-4">
-        <div><label class="block text-sm font-semibold mb-1">ID Elève *</label><input type="number" id="insc-eleve-id" required min="1" class="w-full border p-2 text-sm"></div>
-        <div><label class="block text-sm font-semibold mb-1">Année *</label><input type="text" id="insc-annee" required pattern="\d{4}-\d{4}" class="w-full border p-2 text-sm" placeholder="2025-2026"></div>
-        <div class="flex gap-4">
-          <div class="flex-1"><label class="block text-sm font-semibold mb-1">Niveau *</label><input type="number" id="insc-niveau" required min="3" max="6" class="w-full border p-2 text-sm"></div>
-          <div class="flex-1"><label class="block text-sm font-semibold mb-1">Lettre *</label><input type="text" id="insc-lettre" required maxlength="1" class="w-full border p-2 text-sm"></div>
+  <!-- Modale Simplifiée -->
+  <div id="modal-inscription" class="fixed inset-0 bg-asimov-bg/90 backdrop-blur-sm flex items-center justify-center hidden z-[200] p-6">
+    <div class="bg-asimov-bgSecondary p-12 rounded-3xl border border-white/10 w-full max-w-xl">
+      <h3 class="text-3xl font-black uppercase tracking-tighter mb-10" id="modal-inscription-title">Inscription</h3>
+      <form id="form-inscription" class="grid gap-8">
+        <input type="hidden" id="inscription-id" />
+        <div class="space-y-2">
+          <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">ID de l'Élève *</label>
+          <input type="number" id="insc-eleve-id" required class="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm">
         </div>
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="fermerModalInscription()" class="bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300">Annuler</button>
-          <button type="submit" id="btn-submit-inscription" class="bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700">Inscrire</button>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">ID de la Classe *</label>
+            <input type="number" id="insc-classe-id" required class="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm">
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">Année Scolaire *</label>
+            <input type="text" id="insc-annee" required class="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm" placeholder="2025-2026">
+          </div>
+        </div>
+        
+        <div class="pt-6 flex justify-end gap-4">
+          <button type="button" onclick="fermerModalInscription()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors">Annuler</button>
+          <button type="submit" id="btn-submit-inscription" class="px-10 py-4 bg-asimov-accent text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all font-bold">Enregistrer</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="modal-confirm-insc" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-6 border border-gray-400 max-w-sm text-center">
-      <h3 class="text-xl font-bold mb-2">Désinscrire ?</h3>
-      <div class="flex justify-center gap-2 mt-4">
-        <button onclick="fermerConfirmInsc()" class="bg-gray-200 px-4 py-2 text-sm font-medium">Annuler</button>
-        <button id="btn-confirm-suppr-insc" class="bg-red-600 text-white px-4 py-2 text-sm font-medium">Supprimer</button>
+  <!-- Modal Confirmation Suppression -->
+  <div id="modal-confirm-insc" class="fixed inset-0 bg-asimov-bg/90 backdrop-blur-sm flex items-center justify-center hidden z-[200] p-6">
+    <div class="bg-asimov-bgSecondary p-12 rounded-3xl border border-white/10 max-w-sm text-center">
+      <div class="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-red-500/20">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+      </div>
+      <h3 class="text-2xl font-black uppercase tracking-tighter mb-4">Désinscrire ?</h3>
+      <p class="text-asimov-textMuted text-sm font-medium mb-12">L'inscription sera définitivement supprimée du registre.</p>
+      <div class="flex justify-center gap-4">
+        <button onclick="fermerConfirmInsc()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-xl font-bold">Annuler</button>
+        <button id="btn-confirm-suppr-insc" class="px-10 py-4 bg-red-600 text-white font-black uppercase tracking-[0.2em] rounded-xl font-bold shadow-lg shadow-red-600/20 transition-all hover:bg-red-700">Supprimer</button>
       </div>
     </div>
   </div>

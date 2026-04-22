@@ -3,33 +3,55 @@
 <head>
   <%- include('../partials/head') %>
 </head>
-<body class="flex flex-col min-h-screen text-gray-900 font-sans">
+<body class="bg-asimov-bg text-white font-sans selection:bg-asimov-accent/30 flex flex-col min-h-screen">
   
   <%- include('../partials/navbar', { currentRoute: '/dashboard' }) %>
 
-  <main class="flex-1 max-w-5xl w-full mx-auto p-6 mt-4">
-    <h1 class="text-3xl font-bold mb-2">Tableau de bord</h1>
-    <p class="text-gray-600 mb-8 border-b pb-4">Bienvenue, <%= utilisateur.prenom %> <%= utilisateur.nom %></p>
-
-    <div class="grid grid-cols-2 gap-6 mb-8">
-      <div class="bg-white p-6 border border-gray-300">
-        <h3 class="text-lg font-bold mb-1">Élèves</h3>
-        <p class="text-3xl" id="stat-eleves">-</p>
+  <main class="flex-1 max-w-6xl w-full mx-auto p-12">
+    <header class="mb-16">
+      <p class="text-asimov-accent text-[10px] font-black uppercase tracking-[0.4em] mb-4">Portail Administratif</p>
+      <h1 class="text-6xl font-wide uppercase mb-4 tracking-widest">Tableau de bord</h1>
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-asimov-accent animate-pulse"></div>
+        <p class="text-asimov-textMuted text-sm font-medium tracking-wide">Bienvenue, <%= utilisateur.prenom %> <%= utilisateur.nom %></p>
       </div>
-      <div class="bg-white p-6 border border-gray-300">
-        <h3 class="text-lg font-bold mb-1">Options Actives</h3>
-        <p class="text-3xl" id="stat-options">-</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <!-- Stat Card 1 -->
+      <div class="bg-white/5 border border-white/10 p-10 rounded-2xl group hover:border-asimov-accent/50 transition-all duration-300">
+        <div class="flex justify-between items-start mb-8">
+          <div class="p-4 bg-white/5 rounded-2xl text-asimov-accent">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </div>
+          <span class="text-[10px] font-black text-asimov-textMuted uppercase tracking-widest mt-2">Élèves Totaux</span>
+        </div>
+        <p class="text-5xl font-black tracking-tighter" id="stat-eleves">-</p>
+      </div>
+
+      <!-- Stat Card 2 -->
+      <div class="bg-white/5 border border-white/10 p-10 rounded-2xl group hover:border-asimov-accent/50 transition-all duration-300">
+        <div class="flex justify-between items-start mb-8">
+          <div class="p-4 bg-white/5 rounded-2xl text-asimov-accent">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          </div>
+          <span class="text-[10px] font-black text-asimov-textMuted uppercase tracking-widest mt-2">Options Actives</span>
+        </div>
+        <p class="text-5xl font-black tracking-tighter" id="stat-options">-</p>
+      </div>
+
+      <!-- Stat Card 3 -->
+      <div class="bg-white/5 border border-white/10 p-10 rounded-2xl group hover:border-asimov-accent/50 transition-all duration-300">
+        <div class="flex justify-between items-start mb-8">
+          <div class="p-4 bg-white/5 rounded-2xl text-asimov-accent">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+          </div>
+          <span class="text-[10px] font-black text-asimov-textMuted uppercase tracking-widest mt-2">Classes</span>
+        </div>
+        <p class="text-5xl font-black tracking-tighter">12</p>
       </div>
     </div>
 
-    <div class="bg-white p-6 border border-gray-300">
-      <h3 class="text-xl font-bold mb-4">Informations</h3>
-      <ul class="list-disc pl-5 text-gray-700 space-y-2">
-        <li>Mise à jour des conventions de stages pour les 3èmes.</li>
-        <li>Ouverture de la saisie des moyennes semestrielles.</li>
-        <li>Validation définitive des options par le secrétariat.</li>
-      </ul>
-    </div>
   </main>
 
   <script src="/js/dashboard.js"></script>

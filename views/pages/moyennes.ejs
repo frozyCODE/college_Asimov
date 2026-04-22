@@ -3,7 +3,7 @@
 <head>
   <%- include('../partials/head') %>
 </head>
-<body class="flex flex-col min-h-screen text-gray-900 font-sans">
+<body class="bg-asimov-bg text-white font-sans selection:bg-asimov-accent/30 flex flex-col min-h-screen">
   
   <%- include('../partials/navbar', { currentRoute: '/moyennes' }) %>
 
@@ -11,60 +11,73 @@
     window.ROLE_UTILISATEUR = "<%= utilisateur.role %>";
   </script>
 
-  <main class="flex-1 max-w-6xl w-full mx-auto p-6 mt-4">
-    <div class="flex justify-between items-end border-b pb-4 mb-6">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-12">
+    <header class="flex justify-between items-center mb-16">
       <div>
-        <h1 class="text-3xl font-bold mb-1">Moyennes Semestrielles</h1>
-        <p class="text-gray-600">Consultez, saisissez et validez les bulletins de notes.</p>
+        <p class="text-asimov-accent text-[10px] font-black uppercase tracking-[0.4em] mb-4">Performance Académique</p>
+        <h1 class="text-6xl font-black tracking-tighter uppercase">Moyennes</h1>
       </div>
       <% if (['Professeur', 'Proviseur'].includes(utilisateur.role)) { %>
-        <button onclick="ouvrirModalAjoutMoyenne()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 text-sm">
-          + Saisir une Moyenne
+        <button onclick="ouvrirModalAjoutMoyenne()" class="px-8 py-4 bg-asimov-accent hover:bg-asimov-accentHover text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all active:scale-[0.98]">
+          + Saisir Moyenne
         </button>
       <% } %>
-    </div>
+    </header>
 
-    <!-- Recherche Moyennes -->
-    <div class="bg-white p-4 border border-gray-300 mb-6 flex gap-2">
-      <input type="number" id="input-insc-id" min="1" placeholder="ID inscription (ex: 1)" class="flex-1 px-3 py-2 border border-gray-300 focus:outline-none focus:border-blue-500 text-sm">
-      <button id="btn-rechercher-moy" onclick="rechercherMoyennes()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 text-sm font-medium">Rechercher</button>
-    </div>
-
-    <!-- Table -->
-    <div class="bg-white border border-gray-300 overflow-x-auto">
-      <table class="w-full text-left border-collapse text-sm">
-        <thead class="bg-gray-100 border-b border-gray-300 text-gray-700">
-          <tr>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">Semestre</th>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">Moyenne / 20</th>
-            <th class="py-3 px-4 font-semibold border-r border-gray-300">Statut</th>
-            <% if (utilisateur.role === 'Proviseur') { %>
-              <th class="py-3 px-4 font-semibold text-right">Action</th>
-            <% } %>
-          </tr>
-        </thead>
-        <tbody id="tbody-moyennes" class="divide-y divide-gray-300">
-          <tr><td colspan="4" class="py-6 px-4 text-center text-gray-500">Entrez un ID d'inscription.</td></tr>
-        </tbody>
-      </table>
+    <!-- Table Area -->
+    <div class="mt-12">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-white/10 bg-white/[0.03] text-white/70">
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px] first:pl-8">ID</th>
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px]">Élève</th>
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px]">Semestre</th>
+              <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px]">Moyenne</th>
+              <% if (['Secretariat', 'Proviseur'].includes(utilisateur.role)) { %>
+                <th class="py-8 px-6 font-wide uppercase tracking-[0.3em] text-[10px] text-right last:pr-8">Actions</th>
+              <% } %>
+            </tr>
+          </thead>
+          <tbody id="tbody-moyennes" class="divide-y divide-white/[0.03]">
+            <!-- Rempli en JS -->
+            <tr><td colspan="5" class="py-32 px-6 text-center text-asimov-textMuted uppercase tracking-widest text-[10px] first:pl-0">Synchronisation des données...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 
   <div id="notification-container" class="notification-container"></div>
   <script src="/js/moyennes.js"></script>
 
-  <!-- Modal Nouvelle Moyenne -->
-  <div id="modal-moyenne" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-6 border border-gray-400 w-full max-w-sm">
-      <h3 class="text-xl font-bold mb-4">Saisir une Moyenne</h3>
-      <form id="form-moyenne" class="space-y-4">
-        <div><label class="block text-sm font-semibold mb-1">ID Inscription *</label><input type="number" id="moy-insc-id" required min="1" class="w-full border bg-gray-100 p-2 text-sm" readonly></div>
-        <div><label class="block text-sm font-semibold mb-1">Semestre *</label><input type="number" id="moy-semestre" required min="1" max="2" class="w-full border p-2 text-sm"></div>
-        <div><label class="block text-sm font-semibold mb-1">Note *</label><input type="number" id="moy-val" required min="0" max="20" step="0.01" class="w-full border p-2 text-sm"></div>
+  <!-- Modale Simplifiée -->
+  <div id="modal-moyenne" class="fixed inset-0 bg-asimov-bg/90 backdrop-blur-sm flex items-center justify-center hidden z-[200] p-6">
+    <div class="bg-asimov-bgSecondary p-12 rounded-3xl border border-white/10 w-full max-w-xl">
+      <h3 class="text-3xl font-black uppercase tracking-tighter mb-10" id="modal-moyenne-title">Saisie de Moyenne</h3>
+      <form id="form-moyenne" class="grid gap-8">
+        <input type="hidden" id="moyenne-id" />
+        <div class="space-y-2">
+          <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">ID de l'Élève *</label>
+          <input type="number" id="moyenne-eleve-id" required class="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">Semestre *</label>
+            <select id="moyenne-semestre" required class="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm appearance-none">
+              <option value="1" class="bg-asimov-bg">Semestre 1</option>
+              <option value="2" class="bg-asimov-bg">Semestre 2</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-widest text-asimov-textMuted ml-1">Moyenne (/20) *</label>
+            <input type="number" step="0.01" id="moyenne-valeur" required class="w-full bg-white/5 border border-white/5 rounded-xl px-6 py-4 focus:outline-none focus:border-asimov-accent focus:bg-white/10 transition-all text-sm">
+          </div>
+        </div>
         
-        <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="fermerModalMoyenne()" class="bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300">Annuler</button>
-          <button type="submit" id="btn-submit-moyenne" class="bg-blue-600 text-white px-4 py-2 text-sm font-medium hover:bg-blue-700">Enregistrer</button>
+        <div class="pt-6 flex justify-end gap-4">
+          <button type="button" onclick="fermerModalMoyenne()" class="px-8 py-4 bg-white/5 text-white font-black uppercase tracking-[0.2em] rounded-xl hover:bg-white/10 transition-colors">Annuler</button>
+          <button type="submit" id="btn-submit-moyenne" class="px-10 py-4 bg-asimov-accent text-white font-black uppercase tracking-[0.2em] rounded-xl transition-all font-bold">Enregistrer</button>
         </div>
       </form>
     </div>
