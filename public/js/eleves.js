@@ -159,7 +159,6 @@ function ouvrirModalEdition(id) {
   document.getElementById('eleve-prenom').value     = eleve.prenom || '';
   document.getElementById('eleve-email').value      = eleve.email  || '';
   document.getElementById('eleve-csv').value        = eleve.identifiant_csv || '';
-  document.getElementById('eleve-ref').value        = eleve.referant_id || '';
   document.getElementById('group-password').style.display = 'none';
   document.getElementById('eleve-password').required = false;
   document.getElementById('modal-eleve').classList.remove('hidden');
@@ -192,7 +191,6 @@ async function soumettreFormEleve(e) {
     prenom:          document.getElementById('eleve-prenom').value.trim(),
     email:           document.getElementById('eleve-email').value.trim(),
     identifiant_csv: document.getElementById('eleve-csv').value.trim() || null,
-    referant:        document.getElementById('eleve-ref').value || null,
   };
 
   if (!modeEdition) {

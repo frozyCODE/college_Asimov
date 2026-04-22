@@ -83,7 +83,6 @@ const updateEleve = async (req, res, next) => {
       nom: req.body.nom !== undefined ? req.body.nom : null,
       prenom: req.body.prenom !== undefined ? req.body.prenom : null,
       email: req.body.email !== undefined ? req.body.email : null,
-      referant: req.body.referant !== undefined ? req.body.referant : null,
       // Ajout des autres champs potentiels mentionnés dans tes commentaires
       identifiant_csv:
         req.body.identifiant_csv !== undefined

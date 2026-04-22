@@ -17,7 +17,7 @@ class EleveModel {
      */
     static async getAll() {
         const [rows] = await db.execute(`
-            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv, e.referant_id 
+            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv 
             FROM Eleves e
             JOIN Utilisateurs u ON e.utilisateur_id = u.id`);
         return rows;
@@ -29,7 +29,7 @@ class EleveModel {
     static async getPaginated(page = 1, limit = 20) {
         const offset = (page - 1) * limit;
         const [rows] = await db.execute(`
-            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv, e.referant_id 
+            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv 
             FROM Eleves e
             JOIN Utilisateurs u ON e.utilisateur_id = u.id
             ORDER BY u.nom ASC, u.prenom ASC
@@ -45,6 +45,20 @@ class EleveModel {
     static async count() {
         const [rows] = await db.execute(`SELECT COUNT(*) as total FROM Eleves`);
         return rows[0].total;
+    }
+
+    /**
+     * Trouve le profil élève correspondant à un compte utilisateur.
+     */
+    static async findByUtilisateurId(utilisateurId) {
+        const [rows] = await db.execute(`
+            SELECT e.*, u.nom, u.prenom, u.email 
+            FROM Eleves e
+            JOIN Utilisateurs u ON e.utilisateur_id = u.id
+            WHERE e.utilisateur_id = ?`,
+            [utilisateurId]
+        );
+        return rows[0] || null;
     }
 
     /**
@@ -76,8 +90,8 @@ class EleveModel {
 
             // 2. Création de l'Élève rattaché
             const [eleveResult] = await connexion.execute(
-                `INSERT INTO Eleves (utilisateur_id, identifiant_csv, referant_id) VALUES (?, ?, ?)`,
-                [newUserId, data.identifiant_csv, data.referant || null]
+                `INSERT INTO Eleves (utilisateur_id, identifiant_csv) VALUES (?, ?)`,
+                [newUserId, data.identifiant_csv]
             );
             
             await connexion.commit();
@@ -104,9 +118,9 @@ class EleveModel {
         const [result] = await db.execute(
             `UPDATE Utilisateurs u 
              JOIN Eleves e ON u.id = e.utilisateur_id 
-             SET u.nom = ?, u.prenom = ?, u.email = ?, e.identifiant_csv = ?, e.referant_id = ? 
+             SET u.nom = ?, u.prenom = ?, u.email = ?, e.identifiant_csv = ? 
              WHERE e.id = ?`,
-            [data.nom, data.prenom, data.email, data.identifiant_csv, data.referant, id]
+            [data.nom, data.prenom, data.email, data.identifiant_csv, id]
         );
         return result.affectedRows;
     }

@@ -101,6 +101,18 @@ class ParentModel {
     );
     return rows;
   }
+
+  static async getParentsByEleve(eleveId) {
+    const [rows] = await db.execute(`
+            SELECT p.id, u.nom, u.prenom, u.email 
+            FROM Parents p
+            JOIN Utilisateurs u ON p.utilisateur_id = u.id
+            JOIN Eleve_Parent ep ON p.id = ep.parent_id
+            WHERE ep.eleve_id = ?`,
+      [eleveId],
+    );
+    return rows;
+  }
 }
 
 module.exports = ParentModel;

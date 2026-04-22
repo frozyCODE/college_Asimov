@@ -55,5 +55,10 @@
   </main>
 
   <script src="/js/dashboard.js"></script>
+  <script>
+    if (window.ROLE_UTILISATEUR === 'Eleve') {
+      window.location.href = '/espace-eleve';
+    }
+  </script>
 </body>
 </html>

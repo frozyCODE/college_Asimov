@@ -26,7 +26,8 @@ async function initPage() {
   try {
     const res = await fetch("/api/eleves");
     if (!res.ok) throw new Error("Impossible de charger les élèves");
-    allEleves = await res.json();
+    const data = await res.json();
+    allEleves = data.data || [];
 
     const select = document.getElementById("select-student");
     select.innerHTML =

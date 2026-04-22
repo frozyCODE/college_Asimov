@@ -1,8 +1,11 @@
 const Utilisateur = require("../models/userModel");
 const Classe      = require("../models/ClasseModel");
 const Eleve       = require("../models/EleveModel");
-const bcrypt      = require("bcrypt");
-const jwt         = require("jsonwebtoken");
+const Inscription = require("../models/InscriptionModel");
+const Moyenne     = require("../models/MoyenneModel");
+const Parent      = require("../models/ParentModel");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 /**
  * @module controllers/webController
@@ -44,8 +47,8 @@ const getLogin = (req, res) => {
   }
   res.render("pages/login", {
     title: "Connexion",
-    error:  req.session.loginError || null,
-    email:  req.session.loginEmail || "",
+    error: req.session.loginError || null,
+    email: req.session.loginEmail || "",
   });
   delete req.session.loginError;
   delete req.session.loginEmail;
@@ -80,7 +83,9 @@ const postLogin = async (req, res) => {
       return res.redirect("/login");
     }
 
-    console.log(`[LOGIN INFO] User found: ${user.nom} ${user.prenom} (Role: ${user.role})`);
+    console.log(
+      `[LOGIN INFO] User found: ${user.nom} ${user.prenom} (Role: ${user.role})`,
+    );
     console.log(`[LOGIN INFO] Hash in DB: ${user.password_hash}`);
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
@@ -97,20 +102,22 @@ const postLogin = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" }
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
     );
 
     // Stockage session
     req.session.utilisateur = {
-      id:     user.id,
-      nom:    user.nom,
+      id: user.id,
+      nom: user.nom,
       prenom: user.prenom,
-      email:  user.email,
-      role:   user.role,
-      token,          // transmis aux pages pour les appels fetch
+      email: user.email,
+      role: user.role,
+      token, // transmis aux pages pour les appels fetch
     };
 
-    console.log(`[LOGIN SUCCESS] ${email} connected successfully! Redirecting to dashboard.`);
+    console.log(
+      `[LOGIN SUCCESS] ${email} connected successfully! Redirecting to dashboard.`,
+    );
     res.redirect("/dashboard");
   } catch (err) {
     console.error("[webController.postLogin] ERROR:", err);
@@ -171,18 +178,18 @@ const getClasses = async (req, res) => {
   }
   try {
     const classes = await Classe.findAll();
-    const eleves  = await Eleve.getAll();
-    res.render("pages/classes", { 
-      utilisateur: req.session.utilisateur, 
-      classes, 
-      eleves 
+    const eleves = await Eleve.getAll();
+    res.render("pages/classes", {
+      utilisateur: req.session.utilisateur,
+      classes,
+      eleves,
     });
   } catch (err) {
     console.error(err);
-    res.render("pages/classes", { 
-      utilisateur: req.session.utilisateur, 
-      classes: [], 
-      eleves: [] 
+    res.render("pages/classes", {
+      utilisateur: req.session.utilisateur,
+      classes: [],
+      eleves: [],
     });
   }
 };
@@ -198,10 +205,48 @@ const getInscriptions = (req, res) => {
 
 /** Page présentation du Projet Asimov */
 const getAsimov = (req, res) => {
-  res.render("pages/projet_asimov", { 
+  res.render("pages/projet_asimov", {
     utilisateur: req.session.utilisateur,
-    title: "Le Projet Asimov"
+    title: "Le Projet Asimov",
   });
+};
+
+/** Page Espace personnel élève */
+const getMonEspace = async (req, res) => {
+  try {
+    const { id: utilisateurId, role } = req.session.utilisateur;
+    if (role !== "Eleve") return res.redirect("/dashboard");
+
+    console.log("DEBUG - Eleve object:", Eleve);
+    console.log("DEBUG - Type of findByUtilisateurId:", typeof Eleve.findByUtilisateurId);
+    const profil = await Eleve.findByUtilisateurId(utilisateurId);
+    if (!profil) {
+      return res.status(404).send("Profil élève introuvable");
+    }
+
+    const [inscriptions, parents] = await Promise.all([
+      Inscription.findByEleve(profil.id),
+      Parent.getParentsByEleve(profil.id),
+    ]);
+
+    const dossier = await Promise.all(
+      inscriptions.map(async (ins) => {
+        const notes = await Moyenne.findByInscription(ins.id);
+        return { ...ins, notes };
+      }),
+    );
+
+    res.render("pages/mon-espace", {
+      utilisateur: req.session.utilisateur,
+      profil,
+      dossier,
+      parents,
+      title: "Mon Espace",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur lors du chargement de l'espace élève");
+  }
 };
 
 module.exports = {
@@ -216,4 +261,5 @@ module.exports = {
   getClasses,
   getInscriptions,
   getAsimov,
+  getMonEspace,
 };
