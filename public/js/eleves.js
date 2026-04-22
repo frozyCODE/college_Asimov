@@ -159,6 +159,7 @@ function ouvrirModalEdition(id) {
   document.getElementById('eleve-prenom').value     = eleve.prenom || '';
   document.getElementById('eleve-email').value      = eleve.email  || '';
   document.getElementById('eleve-csv').value        = eleve.identifiant_csv || '';
+  document.getElementById('eleve-ref').value        = eleve.referant_id || '';
   document.getElementById('group-password').style.display = 'none';
   document.getElementById('eleve-password').required = false;
   document.getElementById('modal-eleve').classList.remove('hidden');
@@ -170,13 +171,13 @@ function fermerModal() {
 
 function demanderSuppression(id) {
   eleveIdASupprimer = id;
-  document.getElementById('modal-confirmer-suppression').classList.remove('hidden');
-  document.getElementById('btn-confirmer-suppression').onclick = supprimerEleve;
+  document.getElementById('modal-confirm').classList.remove('hidden');
+  document.getElementById('btn-confirm-suppr').onclick = supprimerEleve;
 }
 
 function fermerConfirmation() {
   eleveIdASupprimer = null;
-  document.getElementById('modal-confirmer-suppression').classList.add('hidden');
+  document.getElementById('modal-confirm').classList.add('hidden');
 }
 
 /* ======================================================
@@ -191,6 +192,7 @@ async function soumettreFormEleve(e) {
     prenom:          document.getElementById('eleve-prenom').value.trim(),
     email:           document.getElementById('eleve-email').value.trim(),
     identifiant_csv: document.getElementById('eleve-csv').value.trim() || null,
+    referant:        document.getElementById('eleve-ref').value || null,
   };
 
   if (!modeEdition) {

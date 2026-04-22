@@ -17,7 +17,7 @@ class EleveModel {
      */
     static async getAll() {
         const [rows] = await db.execute(`
-            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv 
+            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv, e.referant_id 
             FROM Eleves e
             JOIN Utilisateurs u ON e.utilisateur_id = u.id`);
         return rows;
@@ -29,7 +29,7 @@ class EleveModel {
     static async getPaginated(page = 1, limit = 20) {
         const offset = (page - 1) * limit;
         const [rows] = await db.execute(`
-            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv 
+            SELECT e.id, u.nom, u.prenom, u.email, e.identifiant_csv, e.referant_id 
             FROM Eleves e
             JOIN Utilisateurs u ON e.utilisateur_id = u.id
             ORDER BY u.nom ASC, u.prenom ASC
@@ -76,8 +76,8 @@ class EleveModel {
 
             // 2. Création de l'Élève rattaché
             const [eleveResult] = await connexion.execute(
-                `INSERT INTO Eleves (utilisateur_id, identifiant_csv) VALUES (?, ?)`,
-                [newUserId, data.identifiant_csv]
+                `INSERT INTO Eleves (utilisateur_id, identifiant_csv, referant_id) VALUES (?, ?, ?)`,
+                [newUserId, data.identifiant_csv, data.referant || null]
             );
             
             await connexion.commit();
@@ -104,9 +104,9 @@ class EleveModel {
         const [result] = await db.execute(
             `UPDATE Utilisateurs u 
              JOIN Eleves e ON u.id = e.utilisateur_id 
-             SET u.nom = ?, u.prenom = ?, u.email = ?, e.identifiant_csv = ? 
+             SET u.nom = ?, u.prenom = ?, u.email = ?, e.identifiant_csv = ?, e.referant_id = ? 
              WHERE e.id = ?`,
-            [data.nom, data.prenom, data.email, data.identifiant_csv, id]
+            [data.nom, data.prenom, data.email, data.identifiant_csv, data.referant, id]
         );
         return result.affectedRows;
     }
