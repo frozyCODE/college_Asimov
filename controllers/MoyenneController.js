@@ -77,7 +77,7 @@ const getMoyennesByInscription = async (req, res, next) => {
 const validerMoyenne = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const affectedRows = await Moyenne.validerParProviseur(id);
+    const affectedRows = await Moyenne.validate(id);
 
     if (affectedRows === 0) {
       throw new AppError("Moyenne introuvable.", 404);

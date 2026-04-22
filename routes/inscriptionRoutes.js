@@ -8,18 +8,18 @@ const {
 
 /**
  * @module routes/inscriptionRoutes
- * @description Routes pour la gestion des inscriptions des élèves aux classes.
+ * @description Routes pour la gestion des inscriptions (Lien Élève <-> Classe).
  */
 
 router.use(verifierToken);
 
 /**
  * @route POST /api/inscriptions
- * @group Inscriptions - Gestion des inscriptions
+ * @group Inscriptions - Gestion des affectations
  * @access Privat - Secretariat, Proviseur
- * @param {Object} body.body - Données de l'inscription (eleve_id, classe, annee_scolaire)
- * @returns {Object} 201 - Inscription créée avec succès
- * @returns {Error} 500 - Erreur serveur
+ * @param {Object} body.body - L'identifiant de l'élève et de la classe (eleve_id, classe_id)
+ * @returns {Object} 201 - Inscription enregistrée en base
+ * @returns {Error} 500 - Erreur serveur ou 400 si validation échouée
  */
 router.post(
   "/",
@@ -29,10 +29,10 @@ router.post(
 
 /**
  * @route GET /api/inscriptions/eleve/:eleve_id
- * @group Inscriptions - Gestion des inscriptions
+ * @group Inscriptions - Historique
  * @access Privat - Professeur, Secretariat, Proviseur
- * @param {string} eleve_id.path.required - ID de l'élève
- * @returns {Array<Object>} 200 - Liste des inscriptions de l'élève
+ * @param {string} eleve_id.path.required - L'ID interne de l'élève
+ * @returns {Array<Object>} 200 - Historique des classes formaté avec les années scolaires
  * @returns {Error} 500 - Erreur serveur
  */
 router.get(
@@ -42,26 +42,26 @@ router.get(
 );
 
 /**
- * @route GET /api/inscriptions/classe
- * @group Inscriptions - Gestion des inscriptions
+ * @route GET /api/inscriptions/classe/:classe_id
+ * @group Inscriptions - Trombinoscope
  * @access Privat - Professeur, Secretariat, Proviseur
- * @param {string} classe.query.required - Nom de la classe
- * @returns {Array<Object>} 200 - Liste des élèves de la classe
- * @returns {Error} 500 - Erreur serveur
+ * @param {string} classe_id.path.required - L'ID physique de la classe
+ * @returns {Array<Object>} 200 - Liste des élèves affectés à cette classe
+ * @returns {Error} 500 - Erreur serveur ou 400 si ID manquant
  */
 router.get(
-  "/classe",
+  "/classe/:classe_id",
   autoriserRoles("Professeur", "Secretariat", "Proviseur"),
   inscriptionController.getInscriptionsByClasse,
 );
 
 /**
  * @route DELETE /api/inscriptions/:id
- * @group Inscriptions - Gestion des inscriptions
+ * @group Inscriptions - Gestion des affectations
  * @access Privat - Secretariat, Proviseur
- * @param {string} id.path.required - ID de l'inscription
- * @returns {Object} 200 - Inscription supprimée avec succès
- * @returns {Error} 500 - Erreur serveur
+ * @param {string} id.path.required - L'ID unique de l'inscription à annuler
+ * @returns {Object} 200 - Confirmation de suppression
+ * @returns {Error} 404 - Introuvable
  */
 router.delete(
   "/:id",

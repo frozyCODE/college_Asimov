@@ -38,6 +38,7 @@ const optionRoutes = require("./routes/optionRoutes");
 const parentRoutes = require("./routes/parentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const webRoutes = require("./routes/webRoutes");
+const classeRoutes = require("./routes/classeRoutes");
 const { globalErrorHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
@@ -57,16 +58,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Pour les formulaires HTML POST
 
 // --- Session (authentification EJS) ---
-app.use(session({
-  secret: process.env.SESSION_SECRET || process.env.JWT_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: false, // Passer à true en production avec HTTPS
-    maxAge: 24 * 60 * 60 * 1000, // 24h
-  },
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false, // Passer à true en production avec HTTPS
+      maxAge: 24 * 60 * 60 * 1000, // 24h
+    },
+  }),
+);
 
 // --- Injection automatique du token JWT de session dans les appels /api/ ---
 // Les pages EJS font des fetch() vers /api/* ; ce middleware injecte
@@ -105,6 +108,7 @@ app.use("/api/moyennes", moyenneRoutes);
 app.use("/api/options", optionRoutes);
 app.use("/api/parents", parentRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/classes", classeRoutes);
 
 // --- Routes Web (EJS) ---
 app.use("/", webRoutes);
