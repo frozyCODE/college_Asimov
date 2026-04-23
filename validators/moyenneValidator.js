@@ -1,5 +1,8 @@
 const { body } = require("express-validator");
 
+/**
+ * Validations pour la création d'une moyenne.
+ */
 const createMoyenneValidator = [
   body("inscription_id")
     .notEmpty()
@@ -21,3 +24,4 @@ const createMoyenneValidator = [
 ];
 
 module.exports = { createMoyenneValidator };
+

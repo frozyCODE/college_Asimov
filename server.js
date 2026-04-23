@@ -8,9 +8,9 @@ const path = require("path");
 require("dotenv").config();
 
 /**
- * @module server
- * @description Point d'entrée principal de l'API Asim'UT. Configure les middlewares globaux, les routes et la gestion d'erreurs.
+ * Point d'entrée principal du serveur Asim'UT.
  */
+
 
 // --- Vérification des variables d'environnement obligatoires ---
 const requiredEnvVars = [

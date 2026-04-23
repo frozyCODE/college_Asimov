@@ -1,13 +1,7 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/adminValidator
- * @description Validations pour les opérations administratives et la gestion des comptes de direction.
- */
-
-/**
- * Règles pour POST /api/admin/utilisateurs (créer un compte direction).
- * @constant {Array} createAdminValidator
+ * Validations pour la création de comptes administratifs.
  */
 const createAdminValidator = [
   body("nom").trim().notEmpty().withMessage("Le nom est requis."),
@@ -31,3 +25,4 @@ const createAdminValidator = [
 ];
 
 module.exports = { createAdminValidator };
+

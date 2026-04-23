@@ -2,17 +2,14 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 
 /**
- * @class ProfesseurModel
- * @description Modèle pour gérer l'interaction avec la base de données concernant les Professeurs. Gère la création synchronisée d'un Utilisateur/Professeur.
+ * Modèle pour la gestion des professeurs.
  */
 class ProfesseurModel {
     /**
-     * Récupère la liste de tous les professeurs actifs.
-     * Effectue une jointure avec la table Utilisateurs pour obtenir l'identité complète.
+     * Récupère tous les professeurs actifs.
      * 
      * @async
-     * @static
-     * @returns {Promise<Array<Object>>} Tableau contenant la liste des professeurs (id, nom, prenom, email).
+     * @returns {Promise<Array<Object>>}
      */
     static async getAll() {
         const [rows] = await db.execute(`
@@ -23,18 +20,11 @@ class ProfesseurModel {
     }
 
     /**
-     * Crée un nouveau professeur dans le système (Utilisateur + Profil Professeur).
-     * Utilise une transaction SQL pour garantir l'intégrité des données.
+     * Crée un nouveau professeur (Transaction).
      * 
      * @async
-     * @static
-     * @param {Object} data - Les données du professeur.
-     * @param {string} data.nom - Le nom du professeur.
-     * @param {string} data.prenom - Le prénom du professeur.
-     * @param {string} data.email - L'email du professeur.
-     * @param {string} data.password - Le mot de passe de connexion.
-     * @returns {Promise<number>} L'ID du professeur nouvellement créé dans la table Professeurs.
-     * @throws {Error} Erreur SQL en cas d'échec de transaction ou doublon.
+     * @param {Object} data - { nom, prenom, email, password }
+     * @returns {Promise<number>} L'ID du professeur créé.
      */
     static async create(data) {
         const connexion = await db.getConnection();
@@ -42,14 +32,12 @@ class ProfesseurModel {
             await connexion.beginTransaction();
             const hashedPassword = await bcrypt.hash(data.password, 10);
 
-            // 1. Création de l'Utilisateur avec le rôle Professeur
             const [userResult] = await connexion.execute(
                 `INSERT INTO Utilisateurs (nom, prenom, email, password_hash, role) VALUES (?, ?, ?, ?, 'Professeur')`,
                 [data.nom, data.prenom, data.email, hashedPassword]
             );
             const newUserId = userResult.insertId;
 
-            // 2. Création Professeur lié à l'utilisateur
             const [profResult] = await connexion.execute(
                 `INSERT INTO Professeurs (utilisateur_id) VALUES (?)`,
                 [newUserId]
@@ -67,16 +55,12 @@ class ProfesseurModel {
     }
 
     /**
-     * Met à jour les informations d'identité d'un professeur.
+     * Met à jour les informations d'un professeur.
      * 
      * @async
-     * @static
-     * @param {number|string} id - L'ID de la table Professeurs cible.
-     * @param {Object} data - Les nouvelles données.
-     * @param {string} data.nom - Nouveau nom.
-     * @param {string} data.prenom - Nouveau prénom.
-     * @param {string} data.email - Nouvel email.
-     * @returns {Promise<number>} Le nombre de lignes modifiées (1 si succès).
+     * @param {number|string} id 
+     * @param {Object} data 
+     * @returns {Promise<number>}
      */
     static async update(id, data) {
         const [result] = await db.execute(
@@ -90,12 +74,11 @@ class ProfesseurModel {
     }
 
     /**
-     * Supprime définitivement un professeur et l'utilisateur associé.
+     * Supprime un professeur et son compte associé.
      * 
      * @async
-     * @static
-     * @param {number|string} id - L'ID du professeur à supprimer.
-     * @returns {Promise<number>} Le nombre de lignes supprimées (1 si succès).
+     * @param {number|string} id 
+     * @returns {Promise<number>}
      */
     static async delete(id) {
         const [result] = await db.execute(
@@ -109,3 +92,4 @@ class ProfesseurModel {
 }
 
 module.exports = ProfesseurModel;
+

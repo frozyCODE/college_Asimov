@@ -4,21 +4,13 @@ const jwt = require("jsonwebtoken");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/authController
- * @description Contrôleur responsable de l'authentification globale.
- */
-
-/**
- * Gère la connexion d'un utilisateur (Élève, Professeur, Direction, etc.).
- * Vérifie l'email, le mot de passe hashé, et génère un token JWT si succès.
- *
+ * Gère la connexion des utilisateurs.
+ * 
  * @async
- * @function login
- * @param {import('express').Request} req - L'objet requête Express, contenant l'email et le mot de passe dans `req.body`.
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le Token JWT et les infos publiques de l'utilisateur.
- * @throws {AppError} 401 - Si l'email ou le mot de passe est incorrect.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 401 - Si les identifiants sont incorrects.
  */
 const login = async (req, res, next) => {
   try {
@@ -68,3 +60,4 @@ const login = async (req, res, next) => {
 module.exports = {
   login,
 };
+

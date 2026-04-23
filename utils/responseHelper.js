@@ -1,17 +1,11 @@
 /**
- * @module utils/responseHelper
- * @description Fonctions utilitaires pour standardiser les réponses API.
- */
-
-/**
- * Envoie une réponse JSON de succès standardisée.
+ * Envoie une réponse de succès JSON standardisée.
  * 
- * @function success
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {number} statusCode - Le code HTTP de succès (ex: 200, 201).
- * @param {string} message - Un message descriptif du succès.
- * @param {*} [data] - Les données optionnelles à renvoyer au client.
- * @returns {import('express').Response} La réponse envoyée.
+ * @param {import('express').Response} res 
+ * @param {number} statusCode 
+ * @param {string} message 
+ * @param {*} [data] 
+ * @returns {import('express').Response}
  */
 const success = (res, statusCode, message, data = undefined) => {
   const body = { success: true, message };
@@ -20,14 +14,13 @@ const success = (res, statusCode, message, data = undefined) => {
 };
 
 /**
- * Envoie une réponse JSON d'erreur standardisée (utilisé hors middleware global si nécessaire).
+ * Envoie une réponse d'erreur JSON standardisée.
  * 
- * @function error
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {number} statusCode - Le code HTTP d'erreur (ex: 400, 404, 500).
- * @param {string} message - Le message d'erreur.
- * @param {*} [detail] - Détails techniques (masqués en production).
- * @returns {import('express').Response} La réponse envoyée.
+ * @param {import('express').Response} res 
+ * @param {number} statusCode 
+ * @param {string} message 
+ * @param {*} [detail] 
+ * @returns {import('express').Response}
  */
 const error = (res, statusCode, message, detail = undefined) => {
   const body = { success: false, message };
@@ -38,3 +31,4 @@ const error = (res, statusCode, message, detail = undefined) => {
 };
 
 module.exports = { success, error };
+

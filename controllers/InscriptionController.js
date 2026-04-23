@@ -2,19 +2,12 @@ const Inscription = require("../models/InscriptionModel");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/InscriptionController
- * @description Contrôleur gérant les Inscriptions des élèves aux classes.
- */
-
-/**
- * Créer une nouvelle inscription liant un élève à une classe.
- *
+ * Crée une nouvelle inscription liant un élève à une classe.
+ * 
  * @async
- * @function createInscription
- * @param {import('express').Request} req - Les données d'inscription dans le body (`eleve_id`, `classe_id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant pour la gestion d'erreurs.
- * @returns {Promise<void>} 201 avec un message de succès et l'ID créé.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 400 - Si les champs obligatoires sont manquants.
  */
 const createInscription = async (req, res, next) => {
@@ -38,14 +31,12 @@ const createInscription = async (req, res, next) => {
 };
 
 /**
- * Récupérer l'historique complet des inscriptions pour un élève spécifique.
- *
+ * Récupère l'historique complet des inscriptions pour un élève spécifique.
+ * 
  * @async
- * @function getInscriptionsByEleve
- * @param {import('express').Request} req - L'ID de l'élève en params d'URL (`eleve_id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le tableau d'objets inscriptions formatés.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getInscriptionsByEleve = async (req, res, next) => {
   try {
@@ -58,14 +49,12 @@ const getInscriptionsByEleve = async (req, res, next) => {
 };
 
 /**
- * Récupérer la liste des élèves inscrits dans une classe spécifique.
- *
+ * Récupère la liste des élèves inscrits dans une classe spécifique.
+ * 
  * @async
- * @function getInscriptionsByClasse
- * @param {import('express').Request} req - L'ID de la classe en params d'URL (`classe_id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le tableau détaillé des élèves.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 400 - Si le paramètre classe_id est manquant.
  */
 const getInscriptionsByClasse = async (req, res, next) => {
@@ -87,15 +76,13 @@ const getInscriptionsByClasse = async (req, res, next) => {
 };
 
 /**
- * Supprimer une inscription existante.
- *
+ * Supprime une inscription existante.
+ * 
  * @async
- * @function deleteInscription
- * @param {import('express').Request} req - L'ID de l'inscription à supprimer en params (`id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec confirmation textuelle.
- * @throws {AppError} 404 - Si l'inscription n'existe pas ou a déjà été supprimée.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 404 - Si l'inscription n'existe pas.
  */
 const deleteInscription = async (req, res, next) => {
   try {
@@ -118,3 +105,4 @@ module.exports = {
   getInscriptionsByClasse,
   deleteInscription,
 };
+

@@ -1,7 +1,12 @@
 const bcrypt = require("bcrypt");
 const db = require("./config/db");
 
+/**
+ * Initialise le premier compte administrateur si la base est vide.
+ */
 async function checkAndCreateFirstAdmin() {
+
+
   try {
     const [rows] = await db.execute(
       "SELECT * FROM Utilisateurs WHERE role = 'Proviseur'",

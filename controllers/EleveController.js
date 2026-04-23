@@ -2,19 +2,12 @@ const Eleve = require("../models/EleveModel");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/EleveController
- * @description Contrôleur gérant les opérations CRUD sur les Élèves.
- */
-
-/**
- * Récupérer la liste complète de tous les élèves avec leurs options et parents.
- *
+ * Récupère la liste paginée de tous les élèves.
+ * 
  * @async
- * @function getEleves
- * @param {import('express').Request} req - L'objet de requête Express.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 200 avec le tableau de tous les élèves.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getEleves = async (req, res, next) => {
   try {
@@ -41,14 +34,12 @@ const getEleves = async (req, res, next) => {
 };
 
 /**
- * Créer un nouveau profil Élève (incluant la création de son compte Utilisateur).
- *
+ * Ajoute un nouvel élève et son compte utilisateur associé.
+ * 
  * @async
- * @function addEleve
- * @param {import('express').Request} req - Les données de l'élève (`nom`, `prenom`, `email`, `password`, `identifiant_csv`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 201 avec l'ID du nouvel élève.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const addEleve = async (req, res, next) => {
   try {
@@ -61,29 +52,22 @@ const addEleve = async (req, res, next) => {
 };
 
 /**
- * Modifier les informations personnelles de base d'un élève.
- * Les données entrantes sont nettoyées pour éviter les plantages SQL (remplacement de undefined par null).
- *
+ * Met à jour les informations d'un élève.
+ * 
  * @async
- * @function updateEleve
- * @param {import('express').Request} req - Contient l'ID cible en `req.params.id` et les nouvelles données en `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 200 si la mise à jour a réussi.
- * @throws {AppError} 404 - Si l'élève est introuvable ou si aucune modification n'a été apportée.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 404 - Si l'élève est introuvable.
  */
 const updateEleve = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    // 🛡️ SÉCURISATION DES DONNÉES :
-    // On extrait les valeurs de req.body. Si une valeur n'est pas fournie par le client (undefined),
-    // on force explicitement 'null' pour éviter l'erreur MySQL "Bind parameters must not contain undefined".
     const safeData = {
       nom: req.body.nom !== undefined ? req.body.nom : null,
       prenom: req.body.prenom !== undefined ? req.body.prenom : null,
       email: req.body.email !== undefined ? req.body.email : null,
-      // Ajout des autres champs potentiels mentionnés dans tes commentaires
       identifiant_csv:
         req.body.identifiant_csv !== undefined
           ? req.body.identifiant_csv
@@ -107,15 +91,13 @@ const updateEleve = async (req, res, next) => {
 };
 
 /**
- * Supprimer définitivement un élève et désactiver/supprimer son compte utilisateur.
- *
+ * Supprime un élève par son identifiant.
+ * 
  * @async
- * @function deleteEleve
- * @param {import('express').Request} req - L'ID de l'élève cible en `req.params.id`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 200 si la suppression a réussi.
- * @throws {AppError} 404 - Si l'élève n'existe pas.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 404 - Si l'élève est introuvable.
  */
 const deleteEleve = async (req, res, next) => {
   try {
@@ -138,3 +120,4 @@ module.exports = {
   updateEleve,
   deleteEleve,
 };
+

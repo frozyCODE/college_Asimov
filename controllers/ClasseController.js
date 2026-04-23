@@ -1,5 +1,13 @@
 const Classe = require("../models/ClasseModel");
 
+/**
+ * Récupère la liste de toutes les classes.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
 const getClasses = async (req, res, next) => {
   try {
     const classes = await Classe.findAll();
@@ -8,6 +16,15 @@ const getClasses = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Crée une nouvelle classe.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
 const createClasse = async (req, res, next) => {
   try {
     const { annee_scolaire, niveau, lettre } = req.body;
@@ -23,6 +40,14 @@ const createClasse = async (req, res, next) => {
   }
 };
 
+/**
+ * Supprime une classe par son identifiant.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
 const deleteClasse = async (req, res, next) => {
   try {
     await Classe.delete(req.params.id);
@@ -33,3 +58,4 @@ const deleteClasse = async (req, res, next) => {
 };
 
 module.exports = { getClasses, createClasse, deleteClasse };
+

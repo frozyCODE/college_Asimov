@@ -1,13 +1,7 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/professeurValidator
- * @description Validations pour les profils enseignants.
- */
-
-/**
- * Règles pour POST /api/professeurs.
- * @constant {Array} createProfesseurValidator
+ * Validations pour la création d'un professeur.
  */
 const createProfesseurValidator = [
   body("nom").trim().notEmpty().withMessage("Le nom est requis."),
@@ -26,8 +20,7 @@ const createProfesseurValidator = [
 ];
 
 /**
- * Règles pour PUT /api/professeurs/:id.
- * @constant {Array} updateProfesseurValidator
+ * Validations pour la modification d'un professeur.
  */
 const updateProfesseurValidator = [
   body("nom").trim().notEmpty().withMessage("Le nom est requis."),
@@ -41,3 +34,4 @@ const updateProfesseurValidator = [
 ];
 
 module.exports = { createProfesseurValidator, updateProfesseurValidator };
+

@@ -1,19 +1,10 @@
 /**
- * @module utils/appError
- * @description Classe personnalisée pour gérer les erreurs opérationnelles de l'application.
- */
-
-/**
- * @class AppError
- * @extends Error
- * @description Permet de spécifier un code de statut HTTP et de marquer l'erreur comme opérationnelle pour le traitement global.
+ * Classe d'erreur personnalisée.
  */
 class AppError extends Error {
   /**
-   * Crée une instance d'AppError.
-   * 
-   * @param {string} message - Le message d'erreur explicatif.
-   * @param {number} statusCode - Le code de statut HTTP (ex: 404, 400).
+   * @param {string} message 
+   * @param {number} statusCode 
    */
   constructor(message, statusCode) {
     super(message);
@@ -26,3 +17,4 @@ class AppError extends Error {
 }
 
 module.exports = AppError;
+

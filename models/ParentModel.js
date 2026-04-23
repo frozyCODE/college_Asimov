@@ -2,16 +2,14 @@ const db = require("../config/db");
 const bcrypt = require("bcrypt");
 
 /**
- * @class ParentModel
- * @description Modèle pour interagir avec les données des Parents. Gère la création synchronisée d'un Utilisateur/Parent et les liaisons avec les élèves.
+ * Modèle pour la gestion des parents.
  */
 class ParentModel {
   /**
-   * Récupère la liste de tous les parents avec leurs informations de base.
-   *
+   * Récupère tous les parents.
+   * 
    * @async
-   * @static
-   * @returns {Promise<Array<Object>>} Tableau contenant les parents (id, nom, prenom, email).
+   * @returns {Promise<Array<Object>>}
    */
   static async getAll() {
     const [rows] = await db.execute(`
@@ -22,18 +20,11 @@ class ParentModel {
   }
 
   /**
-   * Ajoute un nouveau parent dans la base de données.
-   * Utilise une transaction pour insérer dans `Utilisateurs` (rôle 'Parent') puis dans `Parents`.
-   *
+   * Crée un nouveau parent (Transaction).
+   * 
    * @async
-   * @static
-   * @param {Object} data - Les données du parent.
-   * @param {string} data.nom - Le nom du parent.
-   * @param {string} data.prenom - Le prénom du parent.
-   * @param {string} data.email - L'email du parent.
-   * @param {string} data.password - Le mot de passe en clair (sera hashé).
-   * @returns {Promise<number>} L'ID du parent dans la table `Parents`.
-   * @throws {Error} Si l'insertion échoue.
+   * @param {Object} data - { nom, prenom, email, password }
+   * @returns {Promise<number>} L'ID du parent créé.
    */
   static async create(data) {
     const connexion = await db.getConnection();
@@ -41,14 +32,12 @@ class ParentModel {
       await connexion.beginTransaction();
       const hashedPassword = await bcrypt.hash(data.password, 10);
 
-      // 1. Création Utilisateur avec rôle 'Parent'
       const [userResult] = await connexion.execute(
         `INSERT INTO Utilisateurs (nom, prenom, email, password_hash, role) VALUES (?, ?, ?, ?, 'Parent')`,
         [data.nom, data.prenom, data.email, hashedPassword],
       );
       const newUserId = userResult.insertId;
 
-      // 2. Création dans la table Parents
       const [parentResult] = await connexion.execute(
         `INSERT INTO Parents (utilisateur_id) VALUES (?)`,
         [newUserId],
@@ -65,13 +54,12 @@ class ParentModel {
   }
 
   /**
-   * Lie un parent à un élève spécifique dans la table de jointure `Eleve_Parent`.
-   *
+   * Lie un parent à un élève.
+   * 
    * @async
-   * @static
-   * @param {number|string} eleveId - L'ID de l'élève.
-   * @param {number|string} parentId - L'ID du parent.
-   * @returns {Promise<boolean>} TRUE si la liaison a réussi.
+   * @param {number|string} eleveId 
+   * @param {number|string} parentId 
+   * @returns {Promise<boolean>}
    */
   static async linkToEleve(eleveId, parentId) {
     await db.execute(
@@ -82,12 +70,11 @@ class ParentModel {
   }
 
   /**
-   * Récupère la liste des élèves affiliés à un parent spécifique.
-   *
+   * Récupère les élèves d'un parent.
+   * 
    * @async
-   * @static
-   * @param {number|string} parentId - L'ID du parent.
-   * @returns {Promise<Array<Object>>} Tableau contenant les ID, noms et prénoms des enfants.
+   * @param {number|string} parentId 
+   * @returns {Promise<Array<Object>>}
    */
   static async getElevesByParent(parentId) {
     const [rows] = await db.execute(
@@ -102,6 +89,13 @@ class ParentModel {
     return rows;
   }
 
+  /**
+   * Récupère les parents d'un élève.
+   * 
+   * @async
+   * @param {number|string} eleveId 
+   * @returns {Promise<Array<Object>>}
+   */
   static async getParentsByEleve(eleveId) {
     const [rows] = await db.execute(`
             SELECT p.id, u.nom, u.prenom, u.email 
@@ -116,3 +110,4 @@ class ParentModel {
 }
 
 module.exports = ParentModel;
+

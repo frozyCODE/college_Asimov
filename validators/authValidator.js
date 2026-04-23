@@ -1,13 +1,7 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/authValidator
- * @description Validations pour l'authentification et les jetons d'accès.
- */
-
-/**
- * Règles de validation pour la route POST /api/auth/login.
- * @constant {Array} loginValidator
+ * Validations pour l'authentification.
  */
 const loginValidator = [
   body("email")
@@ -24,3 +18,4 @@ const loginValidator = [
 ];
 
 module.exports = { loginValidator };
+
