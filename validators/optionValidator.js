@@ -1,21 +1,14 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/optionValidator
- * @description Validations pour la gestion du catalogue d'options et les inscriptions d'élèves.
- */
-
-/**
- * Règles pour POST /api/options (créer une option).
- * @constant {Array} createOptionValidator
+ * Validations pour la gestion des options.
  */
 const createOptionValidator = [
   body("nom").trim().notEmpty().withMessage("Le nom de l'option est requis."),
 ];
 
 /**
- * Règles pour POST /api/options/choisir (assigner une option à un élève).
- * @constant {Array} assignOptionValidator
+ * Validations pour l'assignation d'une option.
  */
 const assignOptionValidator = [
   body("eleve_id")
@@ -31,3 +24,4 @@ const assignOptionValidator = [
 ];
 
 module.exports = { createOptionValidator, assignOptionValidator };
+

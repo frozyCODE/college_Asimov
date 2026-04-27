@@ -1,13 +1,7 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/eleveValidator
- * @description Validations pour la gestion des profils élèves.
- */
-
-/**
- * Règles communes de base pour un utilisateur (appliquées aux élèves).
- * @constant {Array} baseUtilisateurRules
+ * Règles de base pour un utilisateur.
  */
 const baseUtilisateurRules = [
   body("nom").trim().notEmpty().withMessage("Le nom est requis."),
@@ -26,8 +20,7 @@ const baseUtilisateurRules = [
 ];
 
 /**
- * Règles pour POST /api/eleves (création d'un élève).
- * @constant {Array} createEleveValidator
+ * Validations pour la création d'un élève.
  */
 const createEleveValidator = [
   ...baseUtilisateurRules,
@@ -39,8 +32,7 @@ const createEleveValidator = [
 ];
 
 /**
- * Règles pour PUT /api/eleves/:id (modification d'un élève).
- * @constant {Array} updateEleveValidator
+ * Validations pour la modification d'un élève.
  */
 const updateEleveValidator = [
   body("nom").trim().notEmpty().withMessage("Le nom est requis."),
@@ -54,3 +46,4 @@ const updateEleveValidator = [
 ];
 
 module.exports = { createEleveValidator, updateEleveValidator };
+

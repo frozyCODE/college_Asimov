@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr" class="bg-gray-50">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body class="bg-asimov-bg text-white font-sans selection:bg-asimov-accent/30 flex flex-col min-h-screen">
+  
+  <%- include('../partials/navbar', { currentRoute: '/espace-eleve' }) %>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-12">
+    <header class="mb-16">
+      <p class="text-asimov-accent text-[10px] font-black uppercase tracking-[0.4em] mb-4">Espace Personnel</p>
+      <h1 class="text-6xl font-black tracking-tighter uppercase leading-none">
+        Bonjour, <br/>
+        <span class="text-white/20"><%= profil.prenom %></span>
+      </h1>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <!-- Sidebar Profil -->
+      <div class="space-y-8">
+        <section class="glass-card p-10">
+          <h2 class="text-xs font-black uppercase tracking-widest text-asimov-accent mb-8">Informations</h2>
+          <div class="space-y-6">
+            <div>
+              <p class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Identité</p>
+              <p class="text-lg font-bold"><%= profil.prenom %> <%= profil.nom %></p>
+            </div>
+            <div>
+              <p class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">Email</p>
+              <p class="text-sm font-medium text-white/60"><%= profil.email %></p>
+            </div>
+            <div>
+              <p class="text-[9px] font-black uppercase tracking-widest text-white/20 mb-1">ID Étudiant</p>
+              <p class="text-sm font-mono text-asimov-accent">#<%= profil.id %></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Parents / Référents -->
+        <section class="glass-card p-10 border-asimov-accent/10 bg-asimov-accent/[0.01]">
+          <h2 class="text-xs font-black uppercase tracking-widest text-asimov-accent mb-8">Responsables Légaux</h2>
+          <% if (parents.length > 0) { %>
+            <div class="space-y-6">
+            <% parents.forEach(p => { %>
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-asimov-accent/10 rounded-xl flex items-center justify-center text-asimov-accent">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                </div>
+                <div>
+                  <p class="text-sm font-bold"><%= p.prenom %> <%= p.nom %></p>
+                  <p class="text-[10px] text-white/40 uppercase tracking-widest font-black"><%= p.email %></p>
+                </div>
+              </div>
+            <% }) %>
+            </div>
+          <% } else { %>
+            <p class="text-xs text-white/20 italic">Aucun parent référent lié.</p>
+          <% } %>
+        </section>
+      </div>
+
+      <!-- Resultats Scolaires -->
+      <div class="lg:col-span-2 space-y-12">
+        <h2 class="text-2xl font-black uppercase tracking-tighter">Parcours Scolaire</h2>
+        
+        <% if (dossier.length === 0) { %>
+          <div class="glass-card p-20 text-center">
+            <p class="text-white/20 text-sm font-black uppercase tracking-widest">Aucune inscription active trouvée.</p>
+          </div>
+        <% } %>
+
+        <% dossier.forEach(annee => { %>
+          <article class="glass-card overflow-hidden bg-white/[0.01] hover:bg-white/[0.02] transition-colors">
+            <header class="px-10 py-8 bg-white/[0.03] border-b border-white/5 flex justify-between items-center">
+              <div>
+                <h3 class="text-xl font-bold font-clean"><%= annee.annee_scolaire %></h3>
+                <p class="text-[10px] font-black uppercase tracking-widest text-asimov-accent">Classe : <%= annee.niveau %><%= annee.lettre_classe %></p>
+              </div>
+              <div class="px-4 py-2 bg-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white/40">
+                Inscrit
+              </div>
+            </header>
+            
+            <div class="p-10">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <% if (annee.notes.length === 0) { %>
+                   <p class="col-span-2 text-white/10 text-[10px] font-black uppercase tracking-widest">Aucun résultat enregistré pour cette année.</p>
+                <% } else { %>
+                  <% annee.notes.forEach(moy => { %>
+                    <div class="p-6 bg-white/[0.02] rounded-2xl border border-white/5 flex flex-col gap-4">
+                      <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-white/30">Semestre <%= moy.semestre %></span>
+                        <% if (moy.validee_par_proviseur) { %>
+                          <span class="text-[8px] px-2 py-1 bg-emerald-500/10 text-emerald-500 rounded-md font-black uppercase tracking-widest border border-emerald-500/20">Validé</span>
+                        <% } %>
+                      </div>
+                      <div class="flex items-baseline gap-1">
+                        <span class="text-5xl font-black font-clean"><%= Number(moy.moyenne_generale).toFixed(2) %></span>
+                        <span class="text-xs font-bold text-white/20">/20</span>
+                      </div>
+                    </div>
+                  <% }) %>
+                <% } %>
+              </div>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    </div>
+  </main>
+
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+    }
+    .font-wide { font-family: 'Syncopate', sans-serif; }
+    .font-clean { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</body>
+</html>

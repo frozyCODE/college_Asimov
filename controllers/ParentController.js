@@ -3,19 +3,12 @@ const response = require("../utils/responseHelper");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/ParentController
- * @description Contrôleur gérant les opérations sur les profils Parents.
- */
-
-/**
- * Récupérer la liste complète des parents avec leurs comptes utilisateurs.
- *
+ * Récupère la liste complète des parents.
+ * 
  * @async
- * @function getParents
- * @param {import('express').Request} req - L'objet de requête Express.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le catalogue des parents.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getParents = async (req, res, next) => {
   try {
@@ -27,14 +20,12 @@ const getParents = async (req, res, next) => {
 };
 
 /**
- * Créer un nouveau compte Parent (utilisateur + profil parent).
- *
+ * Crée un nouveau compte Parent.
+ * 
  * @async
- * @function addParent
- * @param {import('express').Request} req - Données du parent dans `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 201 avec le nouvel ID.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const addParent = async (req, res, next) => {
   try {
@@ -46,14 +37,12 @@ const addParent = async (req, res, next) => {
 };
 
 /**
- * Associer un parent à un élève spécifique (Table de liaison).
- *
+ * Associe un parent à un élève.
+ * 
  * @async
- * @function lierEleve
- * @param {import('express').Request} req - Contient `eleve_id` et `parent_id` dans `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 201 si le lien est créé.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const lierEleve = async (req, res, next) => {
   try {
@@ -66,15 +55,12 @@ const lierEleve = async (req, res, next) => {
 };
 
 /**
- * Lister les élèves associés à un parent précis.
- * Très utile pour générer un tableau de bord parental.
- *
+ * Liste les élèves associés à un parent.
+ * 
  * @async
- * @function getMesEleves
- * @param {import('express').Request} req - L'ID du parent en params (`parent_id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le tableau d'enfants.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getMesEleves = async (req, res, next) => {
   try {
@@ -87,3 +73,4 @@ const getMesEleves = async (req, res, next) => {
 };
 
 module.exports = { getParents, addParent, lierEleve, getMesEleves };
+

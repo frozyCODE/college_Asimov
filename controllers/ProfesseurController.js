@@ -2,19 +2,12 @@ const Professeur = require("../models/ProfesseurModel");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/ProfesseurController
- * @description Contrôleur gérant les opérations CRUD sur les Professeurs.
- */
-
-/**
- * Récupérer et renvoyer la liste complète des professeurs actifs.
- *
+ * Récupère la liste de tous les professeurs actifs.
+ * 
  * @async
- * @function getProfesseurs
- * @param {import('express').Request} req - L'objet requête Express.
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec le tableau des professeurs.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getProfesseurs = async (req, res, next) => {
   try {
@@ -26,14 +19,12 @@ const getProfesseurs = async (req, res, next) => {
 };
 
 /**
- * Créer un nouveau profil Professeur (et son compte Utilisateur par transaction).
- *
+ * Ajoute un nouveau professeur et son compte utilisateur.
+ * 
  * @async
- * @function addProfesseur
- * @param {import('express').Request} req - Contient les données (nom, prenom, email, password, matiere, trigramme).
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 201 avec l'ID du professeur.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const addProfesseur = async (req, res, next) => {
   try {
@@ -48,14 +39,12 @@ const addProfesseur = async (req, res, next) => {
 };
 
 /**
- * Mettre à jour les informations d'un professeur spécifique.
- *
+ * Met à jour les informations d'un professeur.
+ * 
  * @async
- * @function updateProfesseur
- * @param {import('express').Request} req - L'ID cible en param (`req.params.id`), données en corps (`req.body`).
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 en cas de succès.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 404 - Si le professeur est introuvable.
  */
 const updateProfesseur = async (req, res, next) => {
@@ -74,14 +63,12 @@ const updateProfesseur = async (req, res, next) => {
 };
 
 /**
- * Supprimer définitivement un professeur et l'utilisateur associé.
- *
+ * Supprime un professeur par son identifiant.
+ * 
  * @async
- * @function deleteProfesseur
- * @param {import('express').Request} req - L'ID du professeur en param (`req.params.id`).
- * @param {import('express').Response} res - L'objet réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 en cas de succès.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 404 - Si le professeur est introuvable.
  */
 const deleteProfesseur = async (req, res, next) => {
@@ -104,3 +91,4 @@ module.exports = {
   updateProfesseur,
   deleteProfesseur,
 };
+

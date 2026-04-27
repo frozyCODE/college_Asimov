@@ -1,78 +1,74 @@
 const db = require("../config/db");
 
 /**
- * @class InscriptionModel
- * @description Modèle pour interagir avec la table Inscriptions. Gère les liens entre les élèves et leurs classes pour une année scolaire.
+ * Modèle pour la gestion des inscriptions (liaison Élèves <-> Classes).
  */
 class InscriptionModel {
   /**
-   * Crée une nouvelle inscription pour un élève.
-   *
+   * Crée une nouvelle inscription.
+   * 
    * @async
-   * @static
-   * @param {Object} data - Les données d'inscription.
-   * @param {number} data.eleve_id - L'identifiant de l'élève.
-   * @param {string} data.annee_scolaire - L'année (ex: '2023-2024').
-   * @param {number} data.niveau - Le niveau d'étude (ex: 6, 5, 4, 3).
-   * @param {string} data.lettre_classe - La lettre de la classe (ex: 'A', 'B').
-   * @returns {Promise<number>} L'ID de la nouvelle inscription créée.
+   * @param {Object} data - { eleve_id, classe_id }
+   * @returns {Promise<number>} L'ID de l'inscription.
    */
   static async create(data) {
-    const { eleve_id, annee_scolaire, niveau, lettre_classe } = data;
+    const { eleve_id, classe_id } = data;
     const [result] = await db.execute(
-      `INSERT INTO Inscriptions (eleve_id, annee_scolaire, niveau, lettre_classe) 
-             VALUES (?, ?, ?, ?)`,
-      [eleve_id, annee_scolaire, niveau, lettre_classe],
+      `INSERT INTO Inscriptions (eleve_id, classe_id) VALUES (?, ?)`,
+      [eleve_id, classe_id],
     );
     return result.insertId;
   }
 
   /**
-   * Récupère l'historique complet des inscriptions d'un élève.
-   *
+   * Récupère l'historique des inscriptions d'un élève.
+   * 
    * @async
-   * @static
-   * @param {number|string} eleve_id - L'identifiant de l'élève.
-   * @returns {Promise<Array<Object>>} Liste des inscriptions triées par année descendante.
+   * @param {number|string} eleve_id 
+   * @returns {Promise<Array<Object>>}
    */
   static async findByEleve(eleve_id) {
     const [rows] = await db.execute(
-      `SELECT * FROM Inscriptions WHERE eleve_id = ? ORDER BY annee_scolaire DESC`,
+      `SELECT 
+        i.id, 
+        i.eleve_id, 
+        c.annee_scolaire, 
+        c.niveau, 
+        c.lettre AS lettre_classe 
+       FROM Inscriptions i
+       JOIN Classes c ON i.classe_id = c.id
+       WHERE i.eleve_id = ? 
+       ORDER BY c.annee_scolaire DESC`,
       [eleve_id],
     );
     return rows;
   }
 
   /**
-   * Récupère toutes les inscriptions pour une classe spécifique.
-   * Récupère également les informations d'identité de l'élève via jointure.
-   *
+   * Récupère les inscriptions pour une classe donnée.
+   * 
    * @async
-   * @static
-   * @param {string} annee_scolaire - L'année scolaire ciblée.
-   * @param {number|string} niveau - Le niveau (ex: 3).
-   * @param {string} lettre_classe - La lettre (ex: 'C').
-   * @returns {Promise<Array<Object>>} Liste détaillée des élèves inscrits dans cette classe.
+   * @param {number|string} classe_id 
+   * @returns {Promise<Array<Object>>}
    */
-  static async findByClasse(annee_scolaire, niveau, lettre_classe) {
+  static async findByClasse(classe_id) {
     const [rows] = await db.execute(
       `SELECT i.*, u.nom, u.prenom, u.email 
-             FROM Inscriptions i
-             JOIN Eleves e ON i.eleve_id = e.id
-             JOIN Utilisateurs u ON e.utilisateur_id = u.id
-             WHERE i.annee_scolaire = ? AND i.niveau = ? AND i.lettre_classe = ?`,
-      [annee_scolaire, niveau, lettre_classe],
+       FROM Inscriptions i
+       JOIN Eleves e ON i.eleve_id = e.id
+       JOIN Utilisateurs u ON e.utilisateur_id = u.id
+       WHERE i.classe_id = ?`,
+      [classe_id],
     );
     return rows;
   }
 
   /**
-   * Supprime définitivement une inscription.
-   *
+   * Supprime une inscription.
+   * 
    * @async
-   * @static
-   * @param {number|string} id - L'ID de l'inscription à supprimer.
-   * @returns {Promise<number>} Le nombre de lignes supprimées (1 si succès).
+   * @param {number|string} id 
+   * @returns {Promise<number>} Nombre de lignes affectées.
    */
   static async delete(id) {
     const [result] = await db.execute(`DELETE FROM Inscriptions WHERE id = ?`, [
@@ -83,3 +79,4 @@ class InscriptionModel {
 }
 
 module.exports = InscriptionModel;
+

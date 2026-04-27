@@ -3,19 +3,12 @@ const response = require("../utils/responseHelper");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/StageController
- * @description Contrôleur traitant du processus d'orientation professionnelle et des stages obligatoires.
- */
-
-/**
- * Enregistrer une démarche ou recherche de stage déclarée par un élève.
- *
+ * Enregistre une recherche de stage pour un élève.
+ * 
  * @async
- * @function addRecherche
- * @param {import('express').Request} req - Données de la recherche dans `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 201 avec l'ID du dossier créé.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const addRecherche = async (req, res, next) => {
   try {
@@ -29,15 +22,12 @@ const addRecherche = async (req, res, next) => {
 };
 
 /**
- * Surveiller les situations d'alerte (ex: stage toujours en attente proche de l'échéance).
- * Fonction destinée aux professeurs principaux ou direction.
- *
+ * Récupère les alertes liées aux stages (stages en attente).
+ * 
  * @async
- * @function getAlertes
- * @param {import('express').Request} req - L'objet de requête Express.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec la liste globale des cas alarmants.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getAlertes = async (req, res, next) => {
   try {
@@ -52,3 +42,4 @@ module.exports = {
   addRecherche,
   getAlertes,
 };
+

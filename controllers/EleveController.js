@@ -2,38 +2,44 @@ const Eleve = require("../models/EleveModel");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/EleveController
- * @description Contrôleur gérant les opérations CRUD sur les Élèves.
- */
-
-/**
- * Récupérer la liste complète de tous les élèves avec leurs options et parents.
- *
+ * Récupère la liste paginée de tous les élèves.
+ * 
  * @async
- * @function getEleves
- * @param {import('express').Request} req - L'objet de requête Express.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 200 avec le tableau de tous les élèves.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getEleves = async (req, res, next) => {
   try {
-    const liste = await Eleve.getAll();
-    res.status(200).json(liste);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
+    const [liste, total] = await Promise.all([
+      Eleve.getPaginated(page, limit),
+      Eleve.count(),
+    ]);
+
+    res.status(200).json({
+      data: liste,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     next(error);
   }
 };
 
 /**
- * Créer un nouveau profil Élève (incluant la création de son compte Utilisateur).
- *
+ * Ajoute un nouvel élève et son compte utilisateur associé.
+ * 
  * @async
- * @function addEleve
- * @param {import('express').Request} req - Les données de l'élève (`nom`, `prenom`, `email`, `password`, `identifiant_csv`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 201 avec l'ID du nouvel élève.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const addEleve = async (req, res, next) => {
   try {
@@ -46,30 +52,22 @@ const addEleve = async (req, res, next) => {
 };
 
 /**
- * Modifier les informations personnelles de base d'un élève.
- * Les données entrantes sont nettoyées pour éviter les plantages SQL (remplacement de undefined par null).
- *
+ * Met à jour les informations d'un élève.
+ * 
  * @async
- * @function updateEleve
- * @param {import('express').Request} req - Contient l'ID cible en `req.params.id` et les nouvelles données en `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 200 si la mise à jour a réussi.
- * @throws {AppError} 404 - Si l'élève est introuvable ou si aucune modification n'a été apportée.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 404 - Si l'élève est introuvable.
  */
 const updateEleve = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    // 🛡️ SÉCURISATION DES DONNÉES :
-    // On extrait les valeurs de req.body. Si une valeur n'est pas fournie par le client (undefined),
-    // on force explicitement 'null' pour éviter l'erreur MySQL "Bind parameters must not contain undefined".
     const safeData = {
       nom: req.body.nom !== undefined ? req.body.nom : null,
       prenom: req.body.prenom !== undefined ? req.body.prenom : null,
       email: req.body.email !== undefined ? req.body.email : null,
-      referant: req.body.referant !== undefined ? req.body.referant : null,
-      // Ajout des autres champs potentiels mentionnés dans tes commentaires
       identifiant_csv:
         req.body.identifiant_csv !== undefined
           ? req.body.identifiant_csv
@@ -93,15 +91,74 @@ const updateEleve = async (req, res, next) => {
 };
 
 /**
- * Supprimer définitivement un élève et désactiver/supprimer son compte utilisateur.
- *
+ * Récupère le profil complet de l'élève connecté.
+ * 
  * @async
- * @function deleteEleve
- * @param {import('express').Request} req - L'ID de l'élève cible en `req.params.id`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware pour la gestion des erreurs.
- * @returns {Promise<void>} 200 si la suppression a réussi.
- * @throws {AppError} 404 - Si l'élève n'existe pas.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
+const getProfile = async (req, res, next) => {
+  try {
+    const utilisateurId = req.user.id;
+    const profil = await Eleve.findByUtilisateurId(utilisateurId);
+
+    if (!profil) {
+      throw new AppError("Profil élève non trouvé pour cet utilisateur.", 404);
+    }
+
+    res.status(200).json(profil);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Récupère les détails d'un élève par son ID.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
+const getEleveById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    
+    // Sécurité : Un élève ne peut voir que son propre profil
+    if (req.user.role === "Eleve") {
+      const profil = await Eleve.findByUtilisateurId(req.user.id);
+      if (!profil || profil.id != id) {
+        throw new AppError("Accès interdit. Vous ne pouvez consulter que votre propre profil.", 403);
+      }
+    }
+
+    // On utilise findByUtilisateurId ou on peut créer findById dans le modèle
+    // Pour l'instant on va simuler ou chercher une méthode adaptée
+    // Je vais vérifier si findById existe dans EleveModel
+    const [rows] = await require("../config/db").execute(
+      "SELECT e.*, u.nom, u.prenom, u.email FROM Eleves e JOIN Utilisateurs u ON e.utilisateur_id = u.id WHERE e.id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      throw new AppError("Élève introuvable.", 404);
+    }
+
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Supprime un élève par son identifiant.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 404 - Si l'élève est introuvable.
  */
 const deleteEleve = async (req, res, next) => {
   try {
@@ -123,4 +180,7 @@ module.exports = {
   addEleve,
   updateEleve,
   deleteEleve,
+  getProfile,
+  getEleveById,
 };
+

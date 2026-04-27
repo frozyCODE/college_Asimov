@@ -22,8 +22,8 @@ async function chargerOptions() {
     afficherOptions(toutesLesOptions);
   } catch (err) {
     afficherNotification(err.message, 'error');
-    document.getElementById('tbody-options').innerHTML =
-      `<tr><td colspan="4" class="text-center text-muted">Impossible de charger les options.</td></tr>`;
+    document.getElementById('grid-options').innerHTML =
+      `<div class="col-span-full py-12 text-center text-asimov-textMuted italic">Impossible de charger les options.</div>`;
   }
 }
 
@@ -36,15 +36,20 @@ function afficherOptions(liste) {
   const peutModifier = ['Secretariat', 'Proviseur'].includes(ROLE_UTILISATEUR);
 
   grid.innerHTML = liste.map((o) => `
-    <div class="bg-white border border-gray-300 p-4 flex justify-between items-center">
-      <div>
-        <h3 class="text-lg font-bold">${escapeHtml(o.nom || '—')}</h3>
-        <p class="text-sm text-gray-500">${escapeHtml(o.description || '—')}</p>
+    <div class="bg-white/5 border border-white/10 p-12 rounded-[2.5rem] flex flex-col justify-between group hover:border-asimov-accent/50 transition-all duration-500 hover:shadow-glow">
+      <div class="space-y-6">
+        <h3 class="text-2xl font-wide font-black uppercase tracking-widest text-white mb-2 leading-none">${escapeHtml(o.nom || '—')}</h3>
+        <div class="w-12 h-1 bg-asimov-accent mb-6"></div>
+        <p class="text-sm font-medium text-asimov-textMuted leading-relaxed max-w-[90%]">${escapeHtml(o.description || 'Catalogue de formations spécialisées.')}</p>
       </div>
-      ${peutModifier ? `
-      <div>
-        <button onclick="demanderSuppressionOption(${o.id})" class="text-red-600 hover:underline text-sm font-medium">Supprimer</button>
-      </div>` : ''}
+      <div class="mt-12 flex justify-between items-center bg-white/5 p-4 rounded-2xl">
+        <span class="text-[9px] font-black uppercase tracking-widest text-asimov-textMuted/50">Réf. ADM-${o.id}</span>
+        ${peutModifier ? `
+          <button onclick="demanderSuppressionOption(${o.id})" class="text-red-500 hover:text-red-400 p-2 opacity-40 group-hover:opacity-100 transition-all" title="Supprimer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          </button>
+        ` : ''}
+      </div>
     </div>
   `).join('');
 }
@@ -65,8 +70,8 @@ async function soumettreFormOption(e) {
   e.preventDefault();
 
   const payload = {
-    nom:         document.getElementById('opt-nom').value.trim(),
-    description: document.getElementById('opt-description').value.trim() || null,
+    nom:         document.getElementById('option-nom').value.trim(),
+    description: document.getElementById('option-detail').value.trim() || null,
   };
 
   const btn = document.getElementById('btn-submit-option');
@@ -102,16 +107,16 @@ function demanderSuppressionOption(id) {
   let modalConfirm = document.getElementById('modal-confirmer-option');
   if(!modalConfirm) {
     document.body.insertAdjacentHTML('beforeend', `
-    <div id="modal-confirmer-option" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden p-6 text-center">
-        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-          <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+    <div id="modal-confirmer-option" class="fixed inset-0 bg-asimov-bg/90 backdrop-blur-sm flex items-center justify-center p-6 z-[200]">
+      <div class="bg-asimov-bgSecondary p-10 rounded-2xl border border-white/10 max-w-sm w-full text-center">
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-2xl bg-red-500/10 border border-red-500/20 mb-6">
+          <svg class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
         </div>
-        <h3 class="text-lg font-medium text-slate-900 mb-2">Supprimer cette option ?</h3>
-        <p class="text-sm text-slate-500 mb-6">Action irréversible.</p>
-        <div class="flex justify-center gap-3">
-          <button onclick="fermerConfirmOption()" class="bg-white px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 hover:bg-slate-50">Annuler</button>
-          <button id="btn-confirm-suppr-option" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">Supprimer</button>
+        <h3 class="text-2xl font-black uppercase tracking-tighter text-white mb-4">Supprimer ?</h3>
+        <p class="text-sm text-asimov-textMuted font-medium mb-8">Cette action est définitive et effacera l'option du registre.</p>
+        <div class="flex justify-center gap-4">
+          <button onclick="fermerConfirmOption()" class="px-6 py-3 bg-white/5 text-white rounded-xl font-bold hover:bg-white/10 transition-colors">Annuler</button>
+          <button id="btn-confirm-suppr-option" class="px-8 py-3 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all text-sm uppercase tracking-widest">Confirmer</button>
         </div>
       </div>
     </div>`);

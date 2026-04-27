@@ -1,62 +1,86 @@
-const db = require('../config/db');
+const db = require("../config/db");
 
 /**
- * @class MoyenneModel
- * @description Modèle pour gérer l'interaction avec la base de données concernant les moyennes semestrielles.
+ * Modèle pour la gestion des moyennes semestrielles.
  */
 class MoyenneModel {
-    /**
-     * Ajoute une nouvelle moyenne semestrielle pour une inscription donnée.
-     * 
-     * @async
-     * @static
-     * @param {Object} data - Les données de la moyenne.
-     * @param {number|string} data.inscription_id - L'identifiant de l'inscription de l'élève.
-     * @param {number} data.semestre - Le numéro du semestre (1 ou 2).
-     * @param {number} data.moyenne_generale - La moyenne générale obtenue (ex: 14.50).
-     * @returns {Promise<number>} L'identifiant (ID) de la nouvelle moyenne créée.
-     */
-    static async create(data) {
-        const { inscription_id, semestre, moyenne_generale } = data;
-        const [result] = await db.execute(
-            `INSERT INTO Moyennes_Semestrielles (inscription_id, semestre, moyenne_generale) 
-             VALUES (?, ?, ?)`,
-            [inscription_id, semestre, moyenne_generale]
-        );
-        return result.insertId;
-    }
+  /**
+   * Valide une moyenne par le proviseur.
+   * 
+   * @async
+   * @param {number|string} id 
+   * @returns {Promise<number>}
+   */
+  static async validate(id) {
+    const [result] = await db.execute(
+      "UPDATE Moyennes_Semestrielles SET validee_par_proviseur = TRUE WHERE id = ?",
+      [id],
+    );
+    return result.affectedRows;
+  }
 
-    /**
-     * Récupère les moyennes d'une inscription spécifique.
-     * 
-     * @async
-     * @static
-     * @param {number|string} inscription_id - L'identifiant de l'inscription.
-     * @returns {Promise<Array<Object>>} Tableau des moyennes triées par semestre.
-     */
-    static async findByInscription(inscription_id) {
-        const [rows] = await db.execute(
-            `SELECT * FROM Moyennes_Semestrielles WHERE inscription_id = ? ORDER BY semestre ASC`,
-            [inscription_id]
-        );
-        return rows;
-    }
+  /**
+   * Crée une nouvelle moyenne.
+   * 
+   * @async
+   * @param {Object} data - { inscription_id, semestre, moyenne_generale }
+   * @returns {Promise<number>}
+   */
+  static async create(data) {
+    const { inscription_id, semestre, moyenne_generale } = data;
+    const [result] = await db.execute(
+      "INSERT INTO Moyennes_Semestrielles (inscription_id, semestre, moyenne_generale) VALUES (?, ?, ?)",
+      [inscription_id, semestre, moyenne_generale],
+    );
+    return result.insertId;
+  }
 
-    /**
-     * Valide une moyenne (action effectuée par le proviseur/direction).
-     * 
-     * @async
-     * @static
-     * @param {number|string} id - L'identifiant de la moyenne à valider.
-     * @returns {Promise<number>} Le nombre de lignes affectées (1 si succès).
-     */
-    static async validerParProviseur(id) {
-        const [result] = await db.execute(
-            `UPDATE Moyennes_Semestrielles SET validee_par_proviseur = TRUE WHERE id = ?`,
-            [id]
-        );
-        return result.affectedRows;
-    }
+  /**
+   * Récupère les moyennes d'une inscription.
+   * 
+   * @async
+   * @param {number|string} inscriptionId 
+   * @returns {Promise<Array<Object>>}
+   */
+  static async findByInscription(inscriptionId) {
+    const [rows] = await db.execute(
+      "SELECT * FROM Moyennes_Semestrielles WHERE inscription_id = ?",
+      [inscriptionId],
+    );
+    return rows;
+  }
+
+  /**
+   * Trouve une moyenne par inscription et semestre.
+   * 
+   * @async
+   * @param {number|string} inscription_id 
+   * @param {number} semestre 
+   * @returns {Promise<Object|null>}
+   */
+  static async findByInscriptionAndSemester(inscription_id, semestre) {
+    const [rows] = await db.execute(
+      "SELECT * FROM Moyennes_Semestrielles WHERE inscription_id = ? AND semestre = ?",
+      [inscription_id, semestre],
+    );
+    return rows[0] || null;
+  }
+
+  /**
+   * Supprime une moyenne.
+   * 
+   * @async
+   * @param {number|string} id 
+   * @returns {Promise<number>}
+   */
+  static async delete(id) {
+    const [result] = await db.execute(
+      "DELETE FROM Moyennes_Semestrielles WHERE id = ?",
+      [id],
+    );
+    return result.affectedRows;
+  }
 }
 
 module.exports = MoyenneModel;
+

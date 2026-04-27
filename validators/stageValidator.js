@@ -1,13 +1,7 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/stageValidator
- * @description Validations pour le suivi des démarches de stage.
- */
-
-/**
- * Règles pour POST /api/stages/recherches (ajouter une recherche de stage).
- * @constant {Array} createRechercheValidator
+ * Validations pour l'ajout d'une recherche de stage.
  */
 const createRechercheValidator = [
   body("eleve_id")
@@ -22,3 +16,4 @@ const createRechercheValidator = [
 ];
 
 module.exports = { createRechercheValidator };
+

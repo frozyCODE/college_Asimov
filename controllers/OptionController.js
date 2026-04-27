@@ -1,20 +1,14 @@
 const Option = require("../models/OptionModel");
+const Eleve = require("../models/EleveModel");
 const AppError = require("../utils/appError");
 
 /**
- * @module controllers/OptionController
- * @description Contrôleur gérant les opérations sur les Options.
- */
-
-/**
- * Récupérer la liste complète de toutes les options du catalogue.
- *
+ * Récupère toutes les options du catalogue.
+ * 
  * @async
- * @function getOptions
- * @param {import('express').Request} req - L'objet de requête Express.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec la liste des options.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getOptions = async (req, res, next) => {
   try {
@@ -26,14 +20,12 @@ const getOptions = async (req, res, next) => {
 };
 
 /**
- * Créer une nouvelle option dans le catalogue (ex: Théâtre).
- *
+ * Crée une nouvelle option.
+ * 
  * @async
- * @function addOption
- * @param {import('express').Request} req - Contient le `nom` de la nouvelle option dans `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 201 avec l'ID si succès.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 400 - Si le nom de l'option est manquant.
  */
 const addOption = async (req, res, next) => {
@@ -50,14 +42,12 @@ const addOption = async (req, res, next) => {
 };
 
 /**
- * Assigner une option à un élève. Gère la limite de 2 options par élève.
- *
+ * Assigne une option à un élève (max 2 options).
+ * 
  * @async
- * @function choisirOption
- * @param {import('express').Request} req - Contient `eleve_id` et `option_id` dans `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 201 si succès.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 400 - Si le quota d'options est dépassé.
  */
 const choisirOption = async (req, res, next) => {
@@ -74,15 +64,13 @@ const choisirOption = async (req, res, next) => {
 };
 
 /**
- * Résilier le choix d'une option pour un élève spécifique.
- *
+ * Retire une option pour un élève spécifique.
+ * 
  * @async
- * @function desisterOption
- * @param {import('express').Request} req - Contient `eleve_id` et `option_id` dans `req.body`.
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 si retirée.
- * @throws {AppError} 404 - Si le lien élève-option est introuvable.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ * @throws {AppError} 404 - Si l'assignation est introuvable.
  */
 const desisterOption = async (req, res, next) => {
   try {
@@ -98,18 +86,28 @@ const desisterOption = async (req, res, next) => {
 };
 
 /**
- * Récupérer toutes les options auxquelles un élève est inscrit.
- *
+ * Récupère les options d'un élève.
+ * 
  * @async
- * @function getOptionsByEleve
- * @param {import('express').Request} req - L'ID de l'élève en params (`eleve_id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec la liste de ses options.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getOptionsByEleve = async (req, res, next) => {
   try {
     const eleve_id = req.params.eleve_id;
+
+    // Sécurité : Un élève ne peut voir que ses propres options
+    if (req.user.role === "Eleve") {
+      const profil = await Eleve.findByUtilisateurId(req.user.id);
+      if (!profil || profil.id != eleve_id) {
+        throw new AppError(
+          "Accès interdit. Vous ne pouvez consulter que vos propres options.",
+          403,
+        );
+      }
+    }
+
     const options = await Option.getByEleve(eleve_id);
     res.status(200).json(options);
   } catch (error) {
@@ -118,14 +116,12 @@ const getOptionsByEleve = async (req, res, next) => {
 };
 
 /**
- * Récupérer tous les élèves inscrits dans une option précise.
- *
+ * Récupère les élèves inscrits à une option.
+ * 
  * @async
- * @function getElevesByOption
- * @param {import('express').Request} req - L'ID de l'option en params (`option_id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 avec la liste des élèves correspondants.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  */
 const getElevesByOption = async (req, res, next) => {
   try {
@@ -138,14 +134,12 @@ const getElevesByOption = async (req, res, next) => {
 };
 
 /**
- * Supprimer définitivement une option du catalogue.
- *
+ * Supprime définitivement une option du catalogue.
+ * 
  * @async
- * @function deleteOption
- * @param {import('express').Request} req - L'ID de l'option en params (`id`).
- * @param {import('express').Response} res - L'objet de réponse Express.
- * @param {import('express').NextFunction} next - Middleware suivant.
- * @returns {Promise<void>} 200 si succès.
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
  * @throws {AppError} 404 - Si l'option est introuvable.
  */
 const deleteOption = async (req, res, next) => {
@@ -170,3 +164,4 @@ module.exports = {
   getElevesByOption,
   deleteOption,
 };
+

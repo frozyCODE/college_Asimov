@@ -2,16 +2,14 @@ const db = require("../config/db");
 const AppError = require("../utils/appError");
 
 /**
- * @class OptionModel
- * @description Modèle pour gérer les options (ex: informatique, langues) et leur lien avec les élèves.
+ * Modèle pour la gestion des options du catalogue.
  */
 class OptionModel {
   /**
-   * Récupère la liste de toutes les options disponibles dans le catalogue.
-   *
+   * Récupère toutes les options.
+   * 
    * @async
-   * @static
-   * @returns {Promise<Array<Object>>} Tableau contenant toutes les options triées par nom.
+   * @returns {Promise<Array<Object>>}
    */
   static async getAll() {
     const [rows] = await db.execute("SELECT * FROM Options ORDER BY nom ASC");
@@ -20,11 +18,10 @@ class OptionModel {
 
   /**
    * Crée une nouvelle option.
-   *
+   * 
    * @async
-   * @static
-   * @param {string} nom - Le nom de la nouvelle option.
-   * @returns {Promise<number>} L'ID de l'option nouvellement insérée.
+   * @param {string} nom 
+   * @returns {Promise<number>}
    */
   static async create(nom) {
     const [result] = await db.execute("INSERT INTO Options (nom) VALUES (?)", [
@@ -34,15 +31,13 @@ class OptionModel {
   }
 
   /**
-   * Assigne une option à un élève spécifique.
-   * Vérifie d'abord en base de données si l'élève n'a pas déjà atteint la limite de 2 options.
-   *
+   * Assigne une option à un élève.
+   * 
    * @async
-   * @static
-   * @param {number|string} eleveId - L'ID de l'élève.
-   * @param {number|string} optionId - L'ID de l'option à attribuer.
-   * @returns {Promise<boolean>} TRUE si l'assignation a réussi.
-   * @throws {AppError} 400 - Si l'élève a déjà 2 options.
+   * @param {number|string} eleveId 
+   * @param {number|string} optionId 
+   * @returns {Promise<boolean>}
+   * @throws {AppError} 400 - Si le quota est dépassé.
    */
   static async assignToEleve(eleveId, optionId) {
     const [countResult] = await db.execute(
@@ -62,13 +57,12 @@ class OptionModel {
   }
 
   /**
-   * Supprime le lien (désistement) entre un élève et une option.
-   *
+   * Retire une option d'un élève.
+   * 
    * @async
-   * @static
-   * @param {number|string} eleveId - L'ID de l'élève.
-   * @param {number|string} optionId - L'ID de l'option.
-   * @returns {Promise<number>} Le nombre de lignes affectées (1 si succès, 0 si lien introuvable).
+   * @param {number|string} eleveId 
+   * @param {number|string} optionId 
+   * @returns {Promise<number>}
    */
   static async removeFromEleve(eleveId, optionId) {
     const [result] = await db.execute(
@@ -79,17 +73,16 @@ class OptionModel {
   }
 
   /**
-   * Récupère la liste des options choisies par un élève spécifique.
-   *
+   * Récupère les options d'un élève.
+   * 
    * @async
-   * @static
-   * @param {number|string} eleveId - L'ID de l'élève.
-   * @returns {Promise<Array<Object>>} Tableau contenant les options de l'élève.
+   * @param {number|string} eleveId 
+   * @returns {Promise<Array<Object>>}
    */
   static async getByEleve(eleveId) {
     const [rows] = await db.execute(
       `SELECT o.* FROM Options o
-       JOIN Eleve_Option eo ON o.id = eo.option_idx
+       JOIN Eleve_Option eo ON o.id = eo.option_id
        WHERE eo.eleve_id = ?`,
       [eleveId],
     );
@@ -97,12 +90,11 @@ class OptionModel {
   }
 
   /**
-   * Récupère la liste de tous les élèves inscrits à une option spécifique.
-   *
+   * Récupère les élèves d'une option.
+   * 
    * @async
-   * @static
-   * @param {number|string} optionId - L'ID de l'option.
-   * @returns {Promise<Array<Object>>} Tableau d'objets contenant les informations des élèves.
+   * @param {number|string} optionId 
+   * @returns {Promise<Array<Object>>}
    */
   static async getElevesByOption(optionId) {
     const [rows] = await db.execute(
@@ -117,13 +109,11 @@ class OptionModel {
   }
 
   /**
-   * Supprime définitivement une option du système.
-   * En base de données, la clé étrangère en cascade se charge de supprimer les liens Eleve_Option.
-   *
+   * Supprime une option du catalogue.
+   * 
    * @async
-   * @static
-   * @param {number|string} id - L'ID de l'option à supprimer.
-   * @returns {Promise<number>} Le nombre de lignes affectées (1 si succès).
+   * @param {number|string} id 
+   * @returns {Promise<number>}
    */
   static async delete(id) {
     const [result] = await db.execute("DELETE FROM Options WHERE id = ?", [id]);
@@ -132,3 +122,4 @@ class OptionModel {
 }
 
 module.exports = OptionModel;
+

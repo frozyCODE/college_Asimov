@@ -1,13 +1,7 @@
 const { body } = require("express-validator");
 
 /**
- * @module validators/parentValidator
- * @description Validations pour les profils parentaux et les liaisons enfants.
- */
-
-/**
- * Règles pour POST /api/parents.
- * @constant {Array} createParentValidator
+ * Validations pour la création d'un parent.
  */
 const createParentValidator = [
   body("nom").trim().notEmpty().withMessage("Le nom est requis."),
@@ -26,8 +20,7 @@ const createParentValidator = [
 ];
 
 /**
- * Règles pour POST /api/parents/lier.
- * @constant {Array} lierParentValidator
+ * Validations pour la liaison parent-élève.
  */
 const lierParentValidator = [
   body("eleve_id")
@@ -43,3 +36,4 @@ const lierParentValidator = [
 ];
 
 module.exports = { createParentValidator, lierParentValidator };
+
