@@ -1,4 +1,4 @@
-# Asim'UT API - Système de Gestion Scolaire
+API - Système de Gestion Scolaire
 
 API REST pour la gestion du Collège Asimov. Ce projet fournit une infrastructure robuste pour la gestion des élèves, des professeurs, des inscriptions, des notes (moyennes) et du suivi des stages.
 
