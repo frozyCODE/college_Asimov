@@ -1,6 +1,6 @@
 const Utilisateur = require("../models/userModel");
-const bcrypt      = require("bcrypt");
-const jwt         = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 /**
  * @module controllers/webController
@@ -42,8 +42,8 @@ const getLogin = (req, res) => {
   }
   res.render("pages/login", {
     title: "Connexion",
-    error:  req.session.loginError || null,
-    email:  req.session.loginEmail || "",
+    error: req.session.loginError || null,
+    email: req.session.loginEmail || "",
   });
   delete req.session.loginError;
   delete req.session.loginEmail;
@@ -78,7 +78,9 @@ const postLogin = async (req, res) => {
       return res.redirect("/login");
     }
 
-    console.log(`[LOGIN INFO] User found: ${user.nom} ${user.prenom} (Role: ${user.role})`);
+    console.log(
+      `[LOGIN INFO] User found: ${user.nom} ${user.prenom} (Role: ${user.role})`,
+    );
     console.log(`[LOGIN INFO] Hash in DB: ${user.password_hash}`);
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
@@ -95,20 +97,22 @@ const postLogin = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" }
+      { expiresIn: process.env.JWT_EXPIRES_IN || "24h" },
     );
 
     // Stockage session
     req.session.utilisateur = {
-      id:     user.id,
-      nom:    user.nom,
+      id: user.id,
+      nom: user.nom,
       prenom: user.prenom,
-      email:  user.email,
-      role:   user.role,
-      token,          // transmis aux pages pour les appels fetch
+      email: user.email,
+      role: user.role,
+      token, // transmis aux pages pour les appels fetch
     };
 
-    console.log(`[LOGIN SUCCESS] ${email} connected successfully! Redirecting to dashboard.`);
+    console.log(
+      `[LOGIN SUCCESS] ${email} connected successfully! Redirecting to dashboard.`,
+    );
     res.redirect("/dashboard");
   } catch (err) {
     console.error("[webController.postLogin] ERROR:", err);
