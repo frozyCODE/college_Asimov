@@ -33,6 +33,28 @@ router.get(
 );
 
 /**
+ * @route GET /api/eleves/profile
+ * @desc Récupérer le profil de l'élève connecté (utile pour trouver l'eleve_id)
+ * @access Privat - Eleve
+ */
+router.get(
+  "/profile",
+  autoriserRoles("Eleve"),
+  eleveController.getProfile,
+);
+
+/**
+ * @route GET /api/eleves/:id
+ * @desc Récupérer les détails d'un élève spécifique
+ * @access Privat - Eleve (soi-même), Parent, Professeur, Secretariat, Proviseur
+ */
+router.get(
+  "/:id",
+  autoriserRoles("Eleve", "Parent", "Professeur", "Secretariat", "Proviseur"),
+  eleveController.getEleveById,
+);
+
+/**
  * @route POST /api/eleves
  * @group Élèves - Opérations sur les élèves
  * @access Privat - Secretariat, Proviseur

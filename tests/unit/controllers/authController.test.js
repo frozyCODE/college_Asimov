@@ -19,7 +19,7 @@ describe("authController", () => {
       json: vi.fn().mockReturnThis(),
     };
     next = vi.fn();
-    
+
     // TODO: Ajouter des vi.spyOn() pour les modèles que ce contrôleur utilise
   });
 

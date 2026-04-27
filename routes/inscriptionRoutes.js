@@ -37,7 +37,7 @@ router.post(
  */
 router.get(
   "/eleve/:eleve_id",
-  autoriserRoles("Professeur", "Secretariat", "Proviseur"),
+  autoriserRoles("Professeur", "Secretariat", "Proviseur", "Eleve", "Parent"),
   inscriptionController.getInscriptionsByEleve,
 );
 

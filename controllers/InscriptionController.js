@@ -1,4 +1,5 @@
 const Inscription = require("../models/InscriptionModel");
+const Eleve = require("../models/EleveModel");
 const AppError = require("../utils/appError");
 
 /**
@@ -41,6 +42,18 @@ const createInscription = async (req, res, next) => {
 const getInscriptionsByEleve = async (req, res, next) => {
   try {
     const eleve_id = req.params.eleve_id;
+
+    // Sécurité : Un élève ne peut voir que ses propres inscriptions
+    if (req.user.role === "Eleve") {
+      const profil = await Eleve.findByUtilisateurId(req.user.id);
+      if (!profil || profil.id != eleve_id) {
+        throw new AppError(
+          "Accès interdit. Vous ne pouvez consulter que vos propres inscriptions.",
+          403,
+        );
+      }
+    }
+
     const inscriptions = await Inscription.findByEleve(eleve_id);
     res.status(200).json(inscriptions);
   } catch (error) {

@@ -1,4 +1,5 @@
 const Option = require("../models/OptionModel");
+const Eleve = require("../models/EleveModel");
 const AppError = require("../utils/appError");
 
 /**
@@ -95,6 +96,18 @@ const desisterOption = async (req, res, next) => {
 const getOptionsByEleve = async (req, res, next) => {
   try {
     const eleve_id = req.params.eleve_id;
+
+    // Sécurité : Un élève ne peut voir que ses propres options
+    if (req.user.role === "Eleve") {
+      const profil = await Eleve.findByUtilisateurId(req.user.id);
+      if (!profil || profil.id != eleve_id) {
+        throw new AppError(
+          "Accès interdit. Vous ne pouvez consulter que vos propres options.",
+          403,
+        );
+      }
+    }
+
     const options = await Option.getByEleve(eleve_id);
     res.status(200).json(options);
   } catch (error) {

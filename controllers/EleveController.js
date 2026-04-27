@@ -91,6 +91,67 @@ const updateEleve = async (req, res, next) => {
 };
 
 /**
+ * Récupère le profil complet de l'élève connecté.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
+const getProfile = async (req, res, next) => {
+  try {
+    const utilisateurId = req.user.id;
+    const profil = await Eleve.findByUtilisateurId(utilisateurId);
+
+    if (!profil) {
+      throw new AppError("Profil élève non trouvé pour cet utilisateur.", 404);
+    }
+
+    res.status(200).json(profil);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Récupère les détails d'un élève par son ID.
+ * 
+ * @async
+ * @param {import('express').Request} req 
+ * @param {import('express').Response} res 
+ * @param {import('express').NextFunction} next 
+ */
+const getEleveById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    
+    // Sécurité : Un élève ne peut voir que son propre profil
+    if (req.user.role === "Eleve") {
+      const profil = await Eleve.findByUtilisateurId(req.user.id);
+      if (!profil || profil.id != id) {
+        throw new AppError("Accès interdit. Vous ne pouvez consulter que votre propre profil.", 403);
+      }
+    }
+
+    // On utilise findByUtilisateurId ou on peut créer findById dans le modèle
+    // Pour l'instant on va simuler ou chercher une méthode adaptée
+    // Je vais vérifier si findById existe dans EleveModel
+    const [rows] = await require("../config/db").execute(
+      "SELECT e.*, u.nom, u.prenom, u.email FROM Eleves e JOIN Utilisateurs u ON e.utilisateur_id = u.id WHERE e.id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      throw new AppError("Élève introuvable.", 404);
+    }
+
+    res.status(200).json(rows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Supprime un élève par son identifiant.
  * 
  * @async
@@ -119,5 +180,7 @@ module.exports = {
   addEleve,
   updateEleve,
   deleteEleve,
+  getProfile,
+  getEleveById,
 };
 
