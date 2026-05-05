@@ -15,9 +15,9 @@ pids
 lib-cov
 
 # Coverage directory used by tools like istanbul
-coverage
+coverage/
 *.lcov
-.nyc_output
+.nyc_output/
 
 # Dependency directories
 node_modules/
@@ -29,10 +29,11 @@ jspm_packages/
 # Optional eslint cache
 .eslintcache
 
-# dotenv environment variables file
+# dotenv environment variables
 .env
 .env.test
 .env.local
+.env.*.local
 
 # Output directories (if you use tools like babel or typescript or bundlers)
 dist/
@@ -49,10 +50,12 @@ ehthumbs.db
 Thumbs.db
 
 # IDEs and Editors
-.vscode/
 .idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
