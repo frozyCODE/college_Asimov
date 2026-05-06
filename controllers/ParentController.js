@@ -4,11 +4,11 @@ const AppError = require("../utils/appError");
 
 /**
  * Récupère la liste complète des parents.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const getParents = async (req, res, next) => {
   try {
@@ -21,11 +21,11 @@ const getParents = async (req, res, next) => {
 
 /**
  * Crée un nouveau compte Parent.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const addParent = async (req, res, next) => {
   try {
@@ -38,11 +38,11 @@ const addParent = async (req, res, next) => {
 
 /**
  * Associe un parent à un élève.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const lierEleve = async (req, res, next) => {
   try {
@@ -56,11 +56,11 @@ const lierEleve = async (req, res, next) => {
 
 /**
  * Liste les élèves associés à un parent.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const getMesEleves = async (req, res, next) => {
   try {
@@ -72,5 +72,49 @@ const getMesEleves = async (req, res, next) => {
   }
 };
 
-module.exports = { getParents, addParent, lierEleve, getMesEleves };
+/**
+ * Récupère le profil du parent actuellement authentifié via son token.
+ *
+ * @async
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+const getMonProfil = async (req, res, next) => {
+  try {
+    const parent = await Parent.findByUserId(req.user.id);
+    if (!parent) {
+      return next(new AppError("Profil parent non trouvé.", 404));
+    }
+    return response.success(res, 200, "Profil récupéré.", parent);
+  } catch (error) {
+    next(error);
+  }
+};
 
+/**
+ * Supprime définitivement un parent et ses accès.
+ *
+ * @async
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+const deleteParent = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await Parent.delete(id);
+    return response.success(res, 200, "Parent supprimé avec succès.");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getParents,
+  addParent,
+  lierEleve,
+  getMesEleves,
+  getMonProfil,
+  deleteParent,
+};

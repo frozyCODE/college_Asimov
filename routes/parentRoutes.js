@@ -20,7 +20,7 @@ router.use(verifierToken);
 
 /**
  * @route GET /api/parents
- * @group Parents - Gestion des parents
+ * @desc Récupérer la liste de tous les parents
  * @access Privat - Secretariat, Proviseur
  * @returns {Array<Object>} 200 - Liste de tous les parents
  * @returns {Error} 500 - Erreur serveur
@@ -33,7 +33,7 @@ router.get(
 
 /**
  * @route POST /api/parents
- * @group Parents - Gestion des parents
+ * @desc Créer un nouveau parent
  * @access Privat - Secretariat, Proviseur
  * @param {Object} body.body - Données du parent (nom, prenom, email, password)
  * @returns {Object} 201 - Parent créé avec succès
@@ -49,7 +49,7 @@ router.post(
 
 /**
  * @route POST /api/parents/lier
- * @group Parents - Gestion des parents
+ * @desc Lier un parent à un élève
  * @access Privat - Secretariat, Proviseur
  * @param {Object} body.body - Données de la liaison (eleve_id, parent_id)
  * @returns {Object} 201 - Liaison parent-élève établie
@@ -65,7 +65,7 @@ router.post(
 
 /**
  * @route GET /api/parents/:parent_id/eleves
- * @group Parents - Gestion des parents
+ * @desc Récupérer la liste des enfants d'un parent
  * @access Privat - Parent, Secretariat, Proviseur
  * @param {string} parent_id.path.required - ID du parent
  * @returns {Array<Object>} 200 - Liste des enfants du parent
@@ -75,6 +75,29 @@ router.get(
   "/:parent_id/eleves",
   autoriserRoles("Parent", "Secretariat", "Proviseur"),
   parentController.getMesEleves,
+);
+
+/**
+ * @route GET /api/parents/profile
+ * @desc Récupérer le profil du parent connecté
+ * @access Privat - Parent
+ * @returns {Object} 200 - Profil du parent
+ * @returns {Error} 500 - Erreur serveur
+ */
+router.get("/profile", autoriserRoles("Parent"), parentController.getMonProfil);
+
+/**
+ * @route DELETE /api/parents/:id
+ * @desc Supprimer un parent
+ * @access Privat - Proviseur
+ * @param {string} id.path.required - ID du parent à supprimer
+ * @returns {Object} 200 - Confirmation de suppression
+ * @returns {Error} 500 - Erreur serveur
+ */
+router.delete(
+  "/:id",
+  autoriserRoles("Proviseur"),
+  parentController.deleteParent,
 );
 
 module.exports = router;
