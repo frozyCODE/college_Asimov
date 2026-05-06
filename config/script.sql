@@ -14,6 +14,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- =================================================================
 -- NETTOYAGE DES ANCIENNES TABLES
 -- =================================================================
+DROP TABLE IF EXISTS Demandes_Bourse;
 DROP TABLE IF EXISTS Participations_Projet;
 DROP TABLE IF EXISTS Conventions_Stage;
 DROP TABLE IF EXISTS Recherches_Stage;
@@ -155,6 +156,17 @@ CREATE TABLE Participations_Projet (
     date_fin DATE,
     FOREIGN KEY (projet_id) REFERENCES Projets(id) ON DELETE CASCADE,
     FOREIGN KEY (eleve_id) REFERENCES Eleves(id) ON DELETE CASCADE
+);
+
+CREATE TABLE Demandes_Bourse (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    eleve_id INT NOT NULL,
+    date_demande DATE DEFAULT (CURRENT_DATE),
+    statut ENUM('En attente', 'Acceptée', 'Refusée') DEFAULT 'En attente',
+    traitee_par INT,
+    date_traitement DATE,
+    FOREIGN KEY (eleve_id) REFERENCES Eleves(id) ON DELETE CASCADE,
+    FOREIGN KEY (traitee_par) REFERENCES Utilisateurs(id) ON DELETE SET NULL
 );
 
 

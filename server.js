@@ -11,7 +11,6 @@ require("dotenv").config();
  * Point d'entrée principal du serveur Asim'UT.
  */
 
-
 // --- Vérification des variables d'environnement obligatoires ---
 const requiredEnvVars = [
   "PORT",
@@ -39,6 +38,7 @@ const parentRoutes = require("./routes/parentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const webRoutes = require("./routes/webRoutes");
 const classeRoutes = require("./routes/classeRoutes");
+const bourseRoutes = require("./routes/bourseRoutes");
 const { globalErrorHandler } = require("./middlewares/errorMiddleware");
 
 const app = express();
@@ -109,6 +109,7 @@ app.use("/api/options", optionRoutes);
 app.use("/api/parents", parentRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/classes", classeRoutes);
+app.use("/api/bourses", bourseRoutes);
 
 // --- Routes Web (EJS) ---
 app.use("/", webRoutes);
