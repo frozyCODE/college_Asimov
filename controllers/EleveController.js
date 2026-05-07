@@ -3,11 +3,10 @@ const AppError = require("../utils/appError");
 
 /**
  * Récupère la liste paginée de tous les élèves.
- * 
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const getEleves = async (req, res, next) => {
   try {
@@ -35,11 +34,11 @@ const getEleves = async (req, res, next) => {
 
 /**
  * Ajoute un nouvel élève et son compte utilisateur associé.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const addEleve = async (req, res, next) => {
   try {
@@ -53,11 +52,11 @@ const addEleve = async (req, res, next) => {
 
 /**
  * Met à jour les informations d'un élève.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  * @throws {AppError} 404 - Si l'élève est introuvable.
  */
 const updateEleve = async (req, res, next) => {
@@ -92,11 +91,11 @@ const updateEleve = async (req, res, next) => {
 
 /**
  * Récupère le profil complet de l'élève connecté.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const getProfile = async (req, res, next) => {
   try {
@@ -115,30 +114,30 @@ const getProfile = async (req, res, next) => {
 
 /**
  * Récupère les détails d'un élève par son ID.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 const getEleveById = async (req, res, next) => {
   try {
     const id = req.params.id;
-    
+
     // Sécurité : Un élève ne peut voir que son propre profil
     if (req.user.role === "Eleve") {
       const profil = await Eleve.findByUtilisateurId(req.user.id);
       if (!profil || profil.id != id) {
-        throw new AppError("Accès interdit. Vous ne pouvez consulter que votre propre profil.", 403);
+        throw new AppError(
+          "Accès interdit. Vous ne pouvez consulter que votre propre profil.",
+          403,
+        );
       }
     }
 
-    // On utilise findByUtilisateurId ou on peut créer findById dans le modèle
-    // Pour l'instant on va simuler ou chercher une méthode adaptée
-    // Je vais vérifier si findById existe dans EleveModel
     const [rows] = await require("../config/db").execute(
       "SELECT e.*, u.nom, u.prenom, u.email FROM Eleves e JOIN Utilisateurs u ON e.utilisateur_id = u.id WHERE e.id = ?",
-      [id]
+      [id],
     );
 
     if (rows.length === 0) {
@@ -153,11 +152,11 @@ const getEleveById = async (req, res, next) => {
 
 /**
  * Supprime un élève par son identifiant.
- * 
+ *
  * @async
- * @param {import('express').Request} req 
- * @param {import('express').Response} res 
- * @param {import('express').NextFunction} next 
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  * @throws {AppError} 404 - Si l'élève est introuvable.
  */
 const deleteEleve = async (req, res, next) => {
@@ -183,4 +182,3 @@ module.exports = {
   getProfile,
   getEleveById,
 };
-
