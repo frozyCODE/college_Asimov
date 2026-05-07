@@ -5,43 +5,35 @@ const {
   verifierToken,
   autoriserRoles,
 } = require("../middlewares/authMiddleware");
-const { validerRequete } = require("../middlewares/validationMiddleware");
-const { createRechercheValidator } = require("../validators/stageValidator");
 
 /**
  * @module routes/stageRoutes
- * @description Routes pour la gestion des recherches de stage par les élèves.
+ * @description Routes pour la gestion des stages et des alertes administratives.
  */
 
+// --- Toutes les routes ci-dessous nécessitent d'être connecté ---
 router.use(verifierToken);
 
 /**
  * @route POST /api/stages/recherches
- * @group Stages - Gestion des stages
- * @access Privat - Eleve, Proviseur
- * @param {Object} body.body - Données de la recherche (statut, entreprise, etc.)
- * @returns {Object} 201 - Recherche de stage ajoutée
- * @returns {Error} 500 - Erreur serveur
+ * @desc Permet à un élève (ou admin) de déclarer une nouvelle recherche.
+ * @access Privé - Eleve, Proviseur
  */
 router.post(
   "/recherches",
   autoriserRoles("Eleve", "Proviseur"),
-  createRechercheValidator,
-  validerRequete,
   stageController.addRecherche,
 );
 
 /**
- * @route GET /api/stages/alertes
- * @group Stages - Gestion des stages
- * @access Privat - Professeur, Secretariat, Proviseur
- * @returns {Array<Object>} 200 - Liste des élèves n'ayant pas trouvé de stage
- * @returns {Error} 500 - Erreur serveur
+ * @route GET /api/stages/alertes-quota
+ * @desc Récupère la liste des élèves de 3ème en retard sur leurs stages.
+ * @access Privé - Proviseur, Secretariat
  */
 router.get(
-  "/alertes",
-  autoriserRoles("Professeur", "Secretariat", "Proviseur"),
-  stageController.getAlertes,
+  "/alertes-quota",
+  autoriserRoles("Proviseur", "Secretariat"),
+  stageController.getAlertesQuota3eme,
 );
 
 module.exports = router;
